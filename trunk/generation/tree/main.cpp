@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 #include <ga/ga.h>
 
 
 #define WORDMAXLEN 50
-
+using namespace std;
 
 typedef unsigned int Word;
 char **dictionary = NULL;
@@ -45,19 +45,19 @@ void loadDic()
 
 	fp_in >> size;
 	int s =  size / 10 +1;
-	dictionary = (char**)malloc(sizeof(char*) *s);		
+	dictionary = (char**)malloc(sizeof(char*) *s);
 	for(int i = 0; i < s; i++)
 	{
 		dictionary[i] = (char*)malloc(sizeof(char)*WORDMAXLEN);
 	}
 
-	int i = 0; 
+	int i = 0;
 	while(!fp_in.eof() && i < size) {
 		fp_in.getline(word,WORDMAXLEN);
 		if(fp_in.eof())
 			break;
 		if(i% 10 == 0)
-			strcpy(dictionary[i/10],word);	
+			strcpy(dictionary[i/10],word);
 		i++;
 	}
 
@@ -67,6 +67,7 @@ void loadDic()
 
 float objective(GAGenome &);
 void TreeInitializer(GAGenome &);
+
 void WriteNode(ostream & os, GANode<Topic> * n);
 
 
@@ -75,84 +76,61 @@ main(int argc, char **argv)
 {
 	// load dictionary
 	loadDic();
-  cout.flush();
+	cout.flush();
 
-// See if we've been given a seed to use (for testing purposes).  When you
-// specify a random seed, the evolution will be exactly the same each time
-// you use that seed number.
+    // See if we've been given a seed to use (for testing purposes).  When you
+    // specify a random seed, the evolution will be exactly the same each time
+    // you use that seed number.
 
-  unsigned int seed = 0;
-  for(int ii=1; ii<argc; ii++) {
-    if(strcmp(argv[ii++],"seed") == 0) {
-      seed = atoi(argv[ii]);
+    unsigned int seed = 0;
+    for(int ii=1; ii<argc; ii++) {
+        if(strcmp(argv[ii++],"seed") == 0) {
+            seed = atoi(argv[ii]);
+        }
     }
-  }
 
-  GATreeGenome<Topic> genome(objective);
-  genome.initializer(TreeInitializer);
-  genome.crossover(GATreeGenome<Topic>::OnePointCrossover);
+    GATreeGenome<Topic> genome(objective);
+    genome.initializer(TreeInitializer);
+    genome.crossover(GATreeGenome<Topic>::OnePointCrossover);
 
-  genome.mutator(GATreeGenome<Topic>::SwapSubtreeMutator);
-  GAPopulation swappop(genome, 50);
+    genome.mutator(GATreeGenome<Topic>::SwapSubtreeMutator);
+    GAPopulation swappop(genome, 50);
 
-  genome.mutator(GATreeGenome<Topic>::DestructiveMutator);
-  GAPopulation destpop(genome, 50);
+    genome.mutator(GATreeGenome<Topic>::DestructiveMutator);
+    GAPopulation destpop(genome, 50);
 
-  GASteadyStateGA ga(genome);
-  ga.nGenerations(10);
+    GASteadyStateGA ga(genome);
+    ga.nGenerations(10);
 
-// first do evolution with subtree swap mutator.
+    GATreeGenome<Topic>::
 
-  ga.population(swappop);
+    // first do evolution with subtree swap mutator.
 
-  cout << "initializing...";
-  ga.initialize(seed);
-  cout << "evolving for " << ga.nGenerations() << " generations...";
-  while(!ga.done()){
-    ga.step();
-    cout << ".";
-    cout.flush();
-  }
-  cout << "\n";
+    ga.population(swappop);
 
-  genome = ga.statistics().bestIndividual();
-  cout << "the ga generated a tree with " << genome.size();
-  cout << " nodes, " << genome.depth() << " levels deep.\n";
+    cout << "initializing...";
+    ga.initialize(seed);
+    cout << "evolving for " << ga.nGenerations() << " generations...";
+    while(!ga.done()){
+        ga.step();
+        cout << ".";
+        cout.flush();
+    }
+    cout << "\n";
 
-// now do evolution with destructive swap mutator
+    genome = ga.statistics().bestIndividual();
+    cout << "the ga generated a tree with " << genome.size();
+    cout << " nodes, " << genome.depth() << " levels deep.\n";
 
-  ga.population(destpop);
-
-  cout << "\ninitializing...";
-  ga.initialize();
-  cout << "evolving for " << ga.nGenerations() << " generations...";
-  while(!ga.done()){
-    ga.step();
-    cout << ".";
-    cout.flush();
-  }
-  cout << "\n";
-
-  genome = ga.statistics().bestIndividual();
-  cout << "the ga generated a tree with " << genome.size();
-  cout << " nodes, " << genome.depth() << " levels deep.\n";
-	cout << genome << endl;
-
-  return 0;
+    return 0;
 }
- 
 
 
-/* ----------------------------------------------------------------------------
-  All we do in this objective function is try to maximize the size of the tree.
-Just return the tree size.  This means that if you run this objective function
-for many generations you'll run out of memory!  There is no limit to tree or
-list sizes built-in to the GA library.
----------------------------------------------------------------------------- */
+
 float
 objective(GAGenome & c) {
-  GATreeGenome<Topic> & chrom = (GATreeGenome<Topic> &)c;
-  return chrom.size();
+    GATreeGenome<Topic> & chrom = (GATreeGenome<Topic> &)c;
+    return chrom.size();
 }
 
 
@@ -171,32 +149,32 @@ const int MAX_CHILDREN = 2;
 
 void
 DoChild(GATreeGenome<Topic> & tree, int depth) {
-  if(depth >= MAX_DEPTH) return;
-  int n = GARandomInt(0,MAX_CHILDREN);	// maximum of 5 children
+    if(depth >= MAX_DEPTH) return;
+        int n = GARandomInt(0,MAX_CHILDREN);	// maximum of 5 children
 
-  Topic t(GARandomInt(0,DICSIZE-1));
-  tree.insert(t,GATreeBASE::BELOW);
+    Topic t(GARandomInt(0,DICSIZE-1));
+    tree.insert(t,GATreeBASE::BELOW);
 
-  for(int i=0; i<n; i++)
-    DoChild(tree, depth+1);
+    for(int i=0; i<n; i++)
+        DoChild(tree, depth+1);
 
-  tree.parent();		// move the iterator up one level
+    tree.parent();		// move the iterator up one level
 }
 
 void
 TreeInitializer(GAGenome & c) {
-  GATreeGenome<Topic> &tree=(GATreeGenome<Topic> &)c;
+    GATreeGenome<Topic> &tree=(GATreeGenome<Topic> &)c;
 
-// destroy any pre-existing tree
-  tree.root();
-  tree.destroy();
+    // destroy any pre-existing tree
+    tree.root();
+    tree.destroy();
 
-// create a root node with coordinates 0,0,0, then do the rest.
-  Topic p(GARandomInt(0,DICSIZE-1));
-  tree.insert(p,GATreeBASE::ROOT);
-  int n = GARandomInt(0,MAX_CHILDREN);	// maximum of 5 children
-  for(int i=0; i<n; i++)
-    DoChild(tree, 0);
+    // create a root node with coordinates 0,0,0, then do the rest.
+    Topic p(GARandomInt(0,DICSIZE-1));
+    tree.insert(p,GATreeBASE::ROOT);
+    int n = GARandomInt(0,MAX_CHILDREN);	// maximum of 5 children
+    for(int i=0; i<n; i++)
+        DoChild(tree, 0);
 }
 
 
@@ -205,44 +183,44 @@ TreeInitializer(GAGenome & c) {
    This is a specialization of the write method for the TreeGenome class.  The
 default write method prints out pointers to the nodes.  Here we print the
 contents of the nodes.
-   This is a recursive implementation (yuk) but it gets the job done.  Beware 
+   This is a recursive implementation (yuk) but it gets the job done.  Beware
 that it could crash your machine if your stack is limited and your trees get
 very big.
 ---------------------------------------------------------------------------- */
-void 
+void
 WriteNode(ostream & os, GANode<Topic> * n) {
-  if(!n) return;
-  GANodeBASE * node = (GANodeBASE *)n;
+if(!n) return;
+    GANodeBASE * node = (GANodeBASE *)n;
 
-  os.width(10);
-  os << ((GANode<Topic> *)node)->contents << " ";
-  os.width(10);
-  if(node->parent) os << ((GANode<Topic> *)node->parent)->contents << " ";
-  else os << "." << " ";
-  os.width(10); 
-  if(node->child) os << ((GANode<Topic> *)node->child)->contents << " ";
-  else os << "." << " ";
-  os.width(10);
-  if(node->next) os << ((GANode<Topic> *)node->next)->contents << " ";
-  else os << "." << " ";
-  os.width(10);
-  if(node->prev) os << ((GANode<Topic> *)node->prev)->contents << "\n";
-  else os << ".\n";
-  WriteNode(os, (GANode<Topic> *)node->child);
+    os.width(10);
+    os << ((GANode<Topic> *)node)->contents << " ";
+    os.width(10);
+    if(node->parent) os << ((GANode<Topic> *)node->parent)->contents << " ";
+    else os << "." << " ";
+    os.width(10);
+    if(node->child) os << ((GANode<Topic> *)node->child)->contents << " ";
+    else os << "." << " ";
+    os.width(10);
+    if(node->next) os << ((GANode<Topic> *)node->next)->contents << " ";
+    else os << "." << " ";
+    os.width(10);
+    if(node->prev) os << ((GANode<Topic> *)node->prev)->contents << "\n";
+    else os << ".\n";
+    WriteNode(os, (GANode<Topic> *)node->child);
 
-  for(GANodeBASE * tmp=node->next; tmp && tmp != node; tmp=tmp->next){
+    for(GANodeBASE * tmp=node->next; tmp && tmp != node; tmp=tmp->next){
     os.width(10);
     os << ((GANode<Topic> *)tmp)->contents << " ";
     os.width(10);
     if(tmp->parent) os << ((GANode<Topic> *)tmp->parent)->contents << " ";
     else os << "." << " ";
-    os.width(10); 
+    os.width(10);
     if(tmp->child) os << ((GANode<Topic> *)tmp->child)->contents << " ";
     else os << "." << " ";
-    os.width(10); 
+    os.width(10);
     if(tmp->next) os << ((GANode<Topic> *)tmp->next)->contents << " ";
     else os << "." << " ";
-    os.width(10); 
+    os.width(10);
     if(tmp->prev) os << ((GANode<Topic> *)tmp->prev)->contents << "\n";
     else os << ".\n";
     WriteNode(os, (GANode<Topic> *)tmp->child);
@@ -251,8 +229,8 @@ WriteNode(ostream & os, GANode<Topic> * n) {
 
 template<>
 int GATreeGenome<Topic>::write(ostream & os) const {
-  os << "      node     parent      child       next       prev\n";
-  WriteNode(os, (GANode<Topic> *)rt);
-  return os.fail() ? 1 : 0;
+    os << "      node     parent      child       next       prev\n";
+    WriteNode(os, (GANode<Topic> *)rt);
+    return os.fail() ? 1 : 0;
 }
 
