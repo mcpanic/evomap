@@ -2,9 +2,9 @@
 
 = Introduction =
 
-* 이곳은 최근 알림, 할일, 다른 위키 페이지의 링크 등을 적는다
+  * 이곳은 최근 알림, 할일, 다른 위키 페이지의 링크 등을 적는다
 
 
 = Links =
 
-* [DevelopmentEnviromentAndLibraries 개발환경 및 라이브러리 개요]
+  * [DevelopmentEnviromentAndLibraries 개발환경 및 라이브러리 개요]
