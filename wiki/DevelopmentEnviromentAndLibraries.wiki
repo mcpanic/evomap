@@ -2,8 +2,7 @@
 
 = 환경 =
 
-* gcc 4.1.2
-* GAlib(http://lancet.mit.edu/ga) 2.4.6
-* FANN(http://leenissen.dk/fann/) 2.1.0 beta
-* PHP5
-
+  * gcc 4.1.2
+  * GAlib(http://lancet.mit.edu/ga) 2.4.6
+  * FANN(http://leenissen.dk/fann/) 2.1.0 beta
+  * PHP5
