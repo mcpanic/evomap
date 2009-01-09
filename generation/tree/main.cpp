@@ -67,6 +67,7 @@ void loadDic()
 
 float objective(GAGenome &);
 void TreeInitializer(GAGenome &);
+int TreeMutator(GAGenome &, float);
 
 void WriteNode(ostream & os, GANode<Topic> * n);
 
@@ -93,20 +94,15 @@ main(int argc, char **argv)
     genome.initializer(TreeInitializer);
     genome.crossover(GATreeGenome<Topic>::OnePointCrossover);
 
-    genome.mutator(GATreeGenome<Topic>::SwapSubtreeMutator);
-    GAPopulation swappop(genome, 50);
-
-    genome.mutator(GATreeGenome<Topic>::DestructiveMutator);
-    GAPopulation destpop(genome, 50);
+    genome.mutator(TreeMutator);
+    GAPopulation pop(genome, 50);
 
     GASteadyStateGA ga(genome);
     ga.nGenerations(10);
 
-    GATreeGenome<Topic>::
-
     // first do evolution with subtree swap mutator.
 
-    ga.population(swappop);
+    ga.population(pop);
 
     cout << "initializing...";
     ga.initialize(seed);
@@ -121,6 +117,7 @@ main(int argc, char **argv)
     genome = ga.statistics().bestIndividual();
     cout << "the ga generated a tree with " << genome.size();
     cout << " nodes, " << genome.depth() << " levels deep.\n";
+    cout << genome;
 
     return 0;
 }
@@ -132,7 +129,6 @@ objective(GAGenome & c) {
     GATreeGenome<Topic> & chrom = (GATreeGenome<Topic> &)c;
     return chrom.size();
 }
-
 
 
 /* ----------------------------------------------------------------------------
@@ -178,6 +174,15 @@ TreeInitializer(GAGenome & c) {
 }
 
 
+int TreeMutator(GAGenome &c, float pMut)
+{
+
+    GATreeGenome<Topic>::SwapSubtreeMutator(c, pMut * 0.33);
+    GATreeGenome<Topic>::SwapNodeMutator(c, pMut * 0.33);
+    GATreeGenome<Topic>::DestructiveMutator(c, pMut*0.33);
+
+}
+
 
 /* ----------------------------------------------------------------------------
    This is a specialization of the write method for the TreeGenome class.  The
@@ -212,8 +217,8 @@ if(!n) return;
     os.width(10);
     os << ((GANode<Topic> *)tmp)->contents << " ";
     os.width(10);
-    if(tmp->parent) os << ((GANode<Topic> *)tmp->parent)->contents << " ";
     else os << "." << " ";
+    if(tmp->parent) os << ((GANode<Topic> *)tmp->parent)->contents << " ";
     os.width(10);
     if(tmp->child) os << ((GANode<Topic> *)tmp->child)->contents << " ";
     else os << "." << " ";
