@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1231477525 source:/home/kindone/projects/evomap/generation/tree/main.cpp
+	<stdio.h>
+	<stdlib.h>
+	<iostream>
+	<fstream>
+	<ga/ga.h>
+
