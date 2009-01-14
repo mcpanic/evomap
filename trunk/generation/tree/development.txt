@@ -1,0 +1,36 @@
+Goal
+====
+
+
+
+BrainStorm
+==========
+
+use code::blocks
+fitness sharing
+using scripts - PHP, communication
+    PHP(interface and visualization via HTML+JAVASCRIPT)
+    Upon evaluation, call procedure and get the output (from GA)
+    Return with new interface and visualization
+representation - tree, graph, multigraph
+ouputting XTM
+mutation
+crossover
+
+
+
+
+Roadmap
+=======
+
+
+
+Outline
+=======
+
+
+
+
+
+Implementation Details
+======================

@@ -4,7 +4,6 @@
 #include <fstream>
 #include <ga/ga.h>
 
-
 #define WORDMAXLEN 50
 using namespace std;
 
@@ -15,55 +14,25 @@ int DICSIZE = 0;
 
 class Topic {
 public:
-  Topic(Word w) { _word = w; }
-  Topic(const Topic & p) { _word = p._word; }
-  Topic & operator=(const Topic &p) { _word = p._word; return *this; }
-  ~Topic() {}
+	Topic(Word w) { _word = w; }
+	Topic(const Topic & p) { _word = p._word; }
+	Topic & operator=(const Topic &p) { _word = p._word; return *this; }
+	~Topic() {}
 
 	Word word() const { return _word; }
 	Word word(Word val) { return _word = val; }
 
-  friend ostream & operator<<(ostream & os, const Topic & p){
-    os << "[" << p._word << "]";
-    return os;
-  }
+	friend ostream & operator<<(ostream & os, const Topic & p){
+	os << "[" << p._word << "]";
+	return os;
+	}
 
-protected:
-  Word _word;
+	protected:
+	Word _word;
 };
 
 
-
-
-void loadDic()
-{
-	std::ifstream fp_in;
-	char word[WORDMAXLEN];
-	int size;
-
-	fp_in.open("dictionary.txt", std::ios::in);
-
-	fp_in >> size;
-	int s =  size / 10 +1;
-	dictionary = (char**)malloc(sizeof(char*) *s);
-	for(int i = 0; i < s; i++)
-	{
-		dictionary[i] = (char*)malloc(sizeof(char)*WORDMAXLEN);
-	}
-
-	int i = 0;
-	while(!fp_in.eof() && i < size) {
-		fp_in.getline(word,WORDMAXLEN);
-		if(fp_in.eof())
-			break;
-		if(i% 10 == 0)
-			strcpy(dictionary[i/10],word);
-		i++;
-	}
-
-	size = s;
-	DICSIZE = size;
-}
+void loadDic();
 
 float objective(GAGenome &);
 void TreeInitializer(GAGenome &);
@@ -72,16 +41,16 @@ int TreeMutator(GAGenome &, float);
 void WriteNode(ostream & os, GANode<Topic> * n);
 
 
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	// load dictionary
-	loadDic();
+    loadDic();
 	cout.flush();
 
-    // See if we've been given a seed to use (for testing purposes).  When you
-    // specify a random seed, the evolution will be exactly the same each time
-    // you use that seed number.
+/*      See if we've been given a seed to use (for testing purposes).  When you
+ *      specify a random seed, the evolution will be exactly the same each time
+ *      you use that seed number.
+
 
     unsigned int seed = 0;
     for(int ii=1; ii<argc; ii++) {
@@ -89,6 +58,7 @@ main(int argc, char **argv)
             seed = atoi(argv[ii]);
         }
     }
+*/
 
     GATreeGenome<Topic> genome(objective);
     genome.initializer(TreeInitializer);
@@ -99,14 +69,12 @@ main(int argc, char **argv)
 
     GASteadyStateGA ga(genome);
     ga.nGenerations(10);
-
-    // first do evolution with subtree swap mutator.
-
     ga.population(pop);
 
     cout << "initializing...";
     ga.initialize(seed);
     cout << "evolving for " << ga.nGenerations() << " generations...";
+
     while(!ga.done()){
         ga.step();
         cout << ".";
@@ -124,12 +92,10 @@ main(int argc, char **argv)
 
 
 
-float
-objective(GAGenome & c) {
+float objective(GAGenome & c) {
     GATreeGenome<Topic> & chrom = (GATreeGenome<Topic> &)c;
     return chrom.size();
 }
-
 
 /* ----------------------------------------------------------------------------
   This initializer creates a tree of random size (within limits).  The maximum
@@ -143,10 +109,9 @@ you re-run the GA).
 const int MAX_DEPTH = 3;
 const int MAX_CHILDREN = 2;
 
-void
-DoChild(GATreeGenome<Topic> & tree, int depth) {
-    if(depth >= MAX_DEPTH) return;
-        int n = GARandomInt(0,MAX_CHILDREN);	// maximum of 5 children
+void DoChild(GATreeGenome<Topic> & tree, int depth) {
+	if(depth >= MAX_DEPTH) return;
+		int n = GARandomInt(0,MAX_CHILDREN);	// maximum of 5 children
 
     Topic t(GARandomInt(0,DICSIZE-1));
     tree.insert(t,GATreeBASE::BELOW);
@@ -157,8 +122,7 @@ DoChild(GATreeGenome<Topic> & tree, int depth) {
     tree.parent();		// move the iterator up one level
 }
 
-void
-TreeInitializer(GAGenome & c) {
+void TreeInitializer(GAGenome & c) {
     GATreeGenome<Topic> &tree=(GATreeGenome<Topic> &)c;
 
     // destroy any pre-existing tree
@@ -192,10 +156,9 @@ contents of the nodes.
 that it could crash your machine if your stack is limited and your trees get
 very big.
 ---------------------------------------------------------------------------- */
-void
-WriteNode(ostream & os, GANode<Topic> * n) {
-if(!n) return;
-    GANodeBASE * node = (GANodeBASE *)n;
+void WriteNode(ostream & os, GANode<Topic> * n) {
+	if(!n) return;
+		GANodeBASE * node = (GANodeBASE *)n;
 
     os.width(10);
     os << ((GANode<Topic> *)node)->contents << " ";
@@ -232,10 +195,38 @@ if(!n) return;
   }
 }
 
-template<>
-int GATreeGenome<Topic>::write(ostream & os) const {
+template<> int GATreeGenome<Topic>::write(ostream & os) const {
     os << "      node     parent      child       next       prev\n";
     WriteNode(os, (GANode<Topic> *)rt);
     return os.fail() ? 1 : 0;
 }
 
+void loadDic()
+{
+	std::ifstream fp_in;
+	char word[WORDMAXLEN];
+	int size;
+
+	fp_in.open("dictionary.txt", std::ios::in);
+
+	fp_in >> size;
+	int s =  size / 10 +1;
+	dictionary = (char**)malloc(sizeof(char*) *s);
+	for(int i = 0; i < s; i++)
+	{
+		dictionary[i] = (char*)malloc(sizeof(char)*WORDMAXLEN);
+	}
+
+	int i = 0;
+	while(!fp_in.eof() && i < size) {
+		fp_in.getline(word,WORDMAXLEN);
+		if(fp_in.eof())
+			break;
+		if(i% 10 == 0)
+			strcpy(dictionary[i/10],word);
+		i++;
+	}
+
+	size = s;
+	DICSIZE = size;
+}
