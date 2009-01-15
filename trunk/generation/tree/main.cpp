@@ -107,7 +107,7 @@ memory leak (the initializer may be called more than once - for example when
 you re-run the GA).
 ---------------------------------------------------------------------------- */
 const int MAX_DEPTH = 3;
-const int MAX_CHILDREN = 2;
+const int MAX_CHILDREN = 3;
 
 void DoChild(GATreeGenome<Topic> & tree, int depth) {
 	if(depth >= MAX_DEPTH) return;
