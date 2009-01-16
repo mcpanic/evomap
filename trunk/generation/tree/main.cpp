@@ -50,15 +50,13 @@ int main(int argc, char **argv)
 /*      See if we've been given a seed to use (for testing purposes).  When you
  *      specify a random seed, the evolution will be exactly the same each time
  *      you use that seed number.
-
-
+*/
     unsigned int seed = 0;
     for(int ii=1; ii<argc; ii++) {
         if(strcmp(argv[ii++],"seed") == 0) {
             seed = atoi(argv[ii]);
         }
     }
-*/
 
     GATreeGenome<Topic> genome(objective);
     genome.initializer(TreeInitializer);
@@ -140,11 +138,11 @@ void TreeInitializer(GAGenome & c) {
 
 int TreeMutator(GAGenome &c, float pMut)
 {
-
-    GATreeGenome<Topic>::SwapSubtreeMutator(c, pMut * 0.33);
-    GATreeGenome<Topic>::SwapNodeMutator(c, pMut * 0.33);
-    GATreeGenome<Topic>::DestructiveMutator(c, pMut*0.33);
-
+	int mutNum = 0;
+    mutNum += GATreeGenome<Topic>::SwapSubtreeMutator(c, pMut * 0.33);
+    mutNum += GATreeGenome<Topic>::SwapNodeMutator(c, pMut * 0.33);
+    mutNum += GATreeGenome<Topic>::DestructiveMutator(c, pMut*0.33);
+    return mutNum;
 }
 
 
@@ -180,7 +178,6 @@ void WriteNode(ostream & os, GANode<Topic> * n) {
     os.width(10);
     os << ((GANode<Topic> *)tmp)->contents << " ";
     os.width(10);
-    else os << "." << " ";
     if(tmp->parent) os << ((GANode<Topic> *)tmp->parent)->contents << " ";
     os.width(10);
     if(tmp->child) os << ((GANode<Topic> *)tmp->child)->contents << " ";
