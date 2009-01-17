@@ -1,0 +1,20 @@
+Outline
+===========
+
+* initialization:
+	- max nodes e.g. 8
+	- max connectivity
+
+* mutation:
+	- node mutation
+		- add remove 
+	- edge mutation
+		- add 
+		- remove
+		- relink
+
+* crossover
+	- select k1, k2(node)
+	- recursively select adjacent edges
+	- recursively select adjacent nodes
+	- swap these subgraph
