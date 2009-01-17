@@ -4,14 +4,52 @@
 extern int DICSIZE;
 
 
+MapGenome::MapGenome() {
+	initializer(Init);
+	mutator(Mutate);
+	evaluator(Evaluate);
+	crossover(Cross);
+}
+
+MapGenome::MapGenome(const MapGenome& orig) { 
+	copy(orig); 
+}
+
+MapGenome::~MapGenome() {
+}
+
+MapGenome& MapGenome::operator=(const GAGenome& orig){
+	if(&orig != this) copy(orig);
+	return *this;
+}
+
+GAGenome* MapGenome::clone(CloneMethod) const {return new MapGenome(*this);}
+
+void MapGenome::copy(const GAGenome& orig) {
+	// this copies all of the base genome parts
+	GAListGenome< GAList<int> >& g = (GAListGenome< GAList<int> >&)orig;
+	GAListGenome< GAList<int> >::copy(g);
+}
+
+
+/* Initialization:
+ * n = rand(maxnodes)
+ * while(i<n) 
+ *   make a random node, which is not already in the graph
+ * edgefreq = GARandomDouble(Max);
+ * 
+ * for each node, connect edges by probability(flip coin)
+ *
+ * remove unconnected nodes
+ *
+ */
 void MapGenome::Init(GAGenome &g)
 {
 	//initialize genome as a random topic map	
 	MapGenome &genome = (MapGenome&)g;
-	//destroy any pre-existing nodes
-	genome.reset();
+	// genome.reset();
 
-	/// random frequency for nodes and edges
+	/// random frequency for nodes and edges	
 	double nfq = GARandomDouble();
 	double efq = GARandomDouble();
 
@@ -21,9 +59,6 @@ void MapGenome::Init(GAGenome &g)
 		efq = GARandomDouble();
 	}
 
-	GAList< GAList<int> > &map = genome.map;
-
-
 	for(int i = 0; i < DICSIZE; i++)
 	{
 		if(GAFlipCoin(nfq)) 
@@ -32,7 +67,7 @@ void MapGenome::Init(GAGenome &g)
 
 
 	// connect edges
-	GAListIter< GAList<int> >iter(map);
+	GAListIter< GAList<int> >iter(*this);
 	GAList<int>*head = iter.head();
 
 	bool start = true;
@@ -52,6 +87,15 @@ void MapGenome::Init(GAGenome &g)
 	}
 }
 
+
+/* Mutate:
+ * flip coin(0.5): do node mutation and/or edge mutation
+ *
+ * node mutation (add remove swap)
+ *	
+ * edge mutation (add remove relink)
+ * 
+ */
 int MapGenome::Mutate(GAGenome&g, float pMut)
 {
 	// change topic map by: add/remove node or edge
@@ -202,16 +246,18 @@ float MapGenome::Compare(const GAGenome&g1, const GAGenome&g2)
 {
 	  MapGenome &sis=(MapGenome &)g1;
 	  MapGenome &bro=(MapGenome &)g2;
-
-
 		int s1 = sis.map.size();
 		int s2 = bro.map.size();
 		
 	  return s1 == s2 ? 0 : (s1 > s2 ? s1 - s2 : s2 - s1);
 }
-
 */
 
+/* Crossover:
+ * select k1, k2 from mom and dad
+ * reconstruct brother and sister
+ *
+ */
 int MapGenome::Cross(const GAGenome&g1, const GAGenome&g2, GAGenome*g3, GAGenome*g4)
 {
 	// not to be implemented
