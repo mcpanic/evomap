@@ -21,10 +21,16 @@ public:
 	virtual void copy(const GAGenome& orig);
 
 	/* insert with id id
-	 * return: ptr to genome on success, NULL if fail(id already exist)
+	 * return: true on success, false if fail(id already exist)
 	 */
-	MapGenome* insertNode(int id);
+	bool insertNode(int id);
+	bool insertEdge(int id);
 	void reset();
+	static int getNodeId(GAList<int>& list);
+
+	int MutateNode(float);
+	int MutateEdge(float);
+
 
 private:
 

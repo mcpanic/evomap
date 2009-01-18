@@ -40,7 +40,7 @@ void MapGenome::reset()
 		destroy();
 }
 
-MapGenome* MapGenome::insertNode(int id)
+bool MapGenome::insertNode(int id)
 {
 	GAListIter< GAList<int> >iter(*this);
 	GAList<int>*head = iter.head();
@@ -48,18 +48,53 @@ MapGenome* MapGenome::insertNode(int id)
 	bool start = true;
 	for(GAList<int>* i = head;i && (start || i!=head);i = iter.next())
 	{
+		start = false;
 		int nodeid = *(i->head());
-		if(nodeid == id)
-			return NULL;
-		if(nodeid < id)
+		if(id == nodeid)
+			return false;
+		if(id < nodeid)
 		{
 			warp(iter);
 			GAList<int> newnode;
 			newnode.insert(id);
 			insert(newnode,BEFORE);
+			return true;
 		}
 	}
 
+	// id > all existing node id
+	iter.tail();
+	warp(iter);
+	GAList<int> newnode;
+	newnode.insert(id);
+	insert(newnode);
+	return true;
+
+}
+
+bool MapGenome::insertEdge(int id)
+{
+	GAListIter< GAList<int> >iter(*this);
+	GAList<int>*head = iter.head();
+
+	bool start = true;
+	// check for duplication
+	for(GAList<int>* i = head;i && (start || i!=head);i = iter.next())
+	{
+		start = false;
+		int nodeid = getNodeId(*i);
+		if(id == nodeid)
+			return false;
+	}
+
+	GAList<int>* ilist = tail();
+	ilist->insert(id);
+}
+
+
+int MapGenome::getNodeId(GAList<int>& list)
+{
+	return *(list.head());
 }
 
 
@@ -83,12 +118,13 @@ void MapGenome::Init(GAGenome &g)
 	int maxnodes = GARandomInt(0,MAXINITNODES);
 	while(i<maxnodes)
 	{
-		// make a random, which is not alredy in the graph 
+		// make a random node, which is not alredy in the graph 
 		int id = GARandomInt(0,DICSIZE-1);
-		if(genome.insertNode(id)!=NULL)
+		if(genome.insertNode(id))
 			i++;		
 	}
 
+	// make random edges
 }
 
 
@@ -104,139 +140,22 @@ int MapGenome::Mutate(GAGenome&g, float pMut)
 {
 	// change topic map by: add/remove node or edge
   MapGenome &child=(MapGenome &)g;
-	GAList< GAList<int> > &map = child.map; 
 	int nMut = 0;
 
   if(pMut <= 0.0) return 0;
 
-	nMut += child.MutateNode(pMut);
 
   return nMut;
 }
 
 int MapGenome::MutateNode(float pMut)
 {
-	float pIns = pMut / 3.0;
-	float pDel = pMut / 3.0;
-	float pMod = pMut / 3.0;
-	int nMut = 0;
-
-	// for all nodes, insert/delete/change		
-	GAListIter< GAList<int> >iter(map);
-	GAList<int>*head = iter.head();
-
-	bool ok = false;
-	while(!ok)
-	{
-		int pos = GARandomInt(0,DICSIZE-1);
-		// find appropriate place
-		GAListIter< GAList<int> >iter(map);
-		GAList<int>*head = iter.head();
-		bool start = true;
-		for(GAList<int>* j = head; j && (start || j!=head);j = iter.next())
-		{
-			GAList<int> *next = iter.next();iter.prev();
-			if(next == head)	{
-				if(*(j->head()) == pos)
-					break;
-				if(*(j->head())< pos && pos < DICSIZE)
-				{
-					ok = true;
-					map.warp(iter);
-					map.insert(pos);
-					nMut ++;
-					break;
-				}
-			}
-			else {
-				if(*(j->head()) == pos || *(next->head()) == pos)
-					break;
-				if(*(j->head())< pos && pos < *(next->head()))
-				{
-					ok = true;
-					map.warp(iter);
-					map.insert(pos);
-					nMut ++;
-					break;
-				}
-
-			}					
-		}
-	}
-
-
-	head = iter.head();
-	bool start = true;
-	for(GAList<int>* i = head;i && (start || i!=head);i = iter.next())
-	{
-		start = false;
-
-		/* delete */
-		if(GAFlipCoin(pDel))
-		{
-			map.warp(iter);
-			GAList<int>* del = map.remove();
-			if(del!=NULL) {
-				delete del;
-				nMut ++;
-			}
-		}
-
-		if(GAFlipCoin(pMod)) // delete and insert, keeping nodes
-		{
-			map.warp(iter);
-			GAList<int>* del = map.remove();
-
-			if(del!=NULL)
-			{
-				bool ok = false;
-				while(!ok)
-				{
-					int pos = GARandomInt(0,DICSIZE-1);
-					// find appropriate place
-					GAListIter< GAList<int> >iter(map);		
-					GAList<int>*head = iter.head();
-					bool start = true;
-					for(GAList<int>* j = head; j && (start || j!=head);j = iter.next())
-					{
-						GAList<int> *next = iter.next();iter.prev();
-						if(next == head)	{
-							if(*(j->head()) == pos)
-								break;
-							if(*(j->head())< pos && pos < DICSIZE)
-							{
-								ok = true;
-								map.warp(iter);
-								map.insert(*del);
-								nMut++;
-								break;
-							}
-						}
-						else {
-							if(*(j->head()) == pos || *(next->head()) == pos)
-								break;
-							if(*(j->head())< pos && pos < *(next->head()))
-							{
-								ok = true;
-								map.warp(iter);
-								map.insert(*del);
-								nMut++;
-								break;
-							}
-
-						}					
-					}
-				}
-				delete del;
-			}
-		}
-	}
-	
-	return nMut;
+	return 0;
 } 
 
-void MapGenome::MutateEdge()
+int MapGenome::MutateEdge(float pMut)
 {
+	return 0;
 } 
 
 float MapGenome::Evaluate(GAGenome&g)
