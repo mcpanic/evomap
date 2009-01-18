@@ -1,7 +1,6 @@
 #define MAXINITNODES 6
 
-
-class MapGenome : public GAListGenome< GAList<int> > {
+class MapGenome : public GAListGenome< MapNode > {
 public:
 
 	GADefineIdentity("MapGenome", 201);
@@ -19,6 +18,8 @@ public:
 	MapGenome& operator=(const GAGenome& orig);
 	virtual GAGenome* clone(CloneMethod) const;
 	virtual void copy(const GAGenome& orig);
+	virtual int equal(const GAGenome& g) const;
+	
 
 	/* insert with id id
 	 * return: true on success, false if fail(id already exist)
