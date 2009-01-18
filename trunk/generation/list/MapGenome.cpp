@@ -39,6 +39,16 @@ void MapGenome::copy(const GAGenome& orig) {
 	GAListGenome< GAList<int> >::copy(g);
 }
 
+int MapGenome::equal(const GAGenome& g) const {
+	MapGenome& genome = (MapGenome&)g;
+	
+	int flag = 0;
+	
+
+
+	return flag;
+}
+
 void MapGenome::reset()
 {
 	while(head())
