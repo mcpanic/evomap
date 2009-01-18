@@ -125,7 +125,9 @@ void MapGenome::Init(GAGenome &g)
 		for(MapNode *i2 = head; i2 && (start || i2!=head); i2 = iter.next())
 		{
 			start = false;
-			i->addEdge(i2->getId());
+			// flip coin here
+			if(GAFlipCoin(INITGRAPHSPARSITY))
+				i->addEdge(i2->getId());
 		}
 	}
 
