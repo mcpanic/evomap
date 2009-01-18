@@ -5,8 +5,6 @@
 
 int DICSIZE = 100;
 
-float objective(MapGenome &);
-
 int main(int argc, char* argv[])
 {
 
