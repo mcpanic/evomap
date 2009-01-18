@@ -24,7 +24,29 @@ public:
 	}
 
 	friend ostream& operator<<(ostream &os, const MapGenome & p) {
-	  os << "genome!";
+		GAListIter< MapNode >iter(p.nodeList);
+		MapNode *head = iter.head();
+		bool start = true;
+		
+		for(MapNode* i = head;i && (start || i!=head);i = iter.next())
+		{
+			start = false;
+			os << "node(" << i->getId() << ")" << endl;
+			os << "  toward: ";
+
+			GAListIter<int> iter(*i);
+			int *head = iter.head();
+			bool start = true;
+			for(int *i = head; i && (start || i!=head); i = iter.next())
+			{
+				if(!start) // skip node id
+					os << *i << " ";
+				start = false;
+			}
+			os << endl;
+		}
+
+
 		return os;
 
 	}
@@ -35,7 +57,6 @@ private:
 	void clear();
 	
 	bool insertNode(int id);
-	bool insertEdge(int id);
 	int getNodeId(MapNode& node);
 	int MutateNode(float);
 	int MutateEdge(float);

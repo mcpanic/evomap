@@ -56,14 +56,13 @@ bool MapGenome::insertNode(int id)
 	for(MapNode* i = head;i && (start || i!=head);i = iter.next())
 	{
 		start = false;
-		int nodeid = *(i->head());
+		int nodeid = i->getId();
 		if(id == nodeid)
 			return false;
 		if(id < nodeid)
 		{
 			nodeList.warp(iter);
-			MapNode newnode;
-			newnode.insert(id);
+			MapNode newnode(id);
 			nodeList.insert(newnode,GAListBASE::BEFORE);
 			return true;
 		}
@@ -72,31 +71,12 @@ bool MapGenome::insertNode(int id)
 	// id > all existing node id
 	iter.tail();
 	nodeList.warp(iter);
-	MapNode newnode;
-	newnode.insert(id);
+	MapNode newnode(id);
 	nodeList.insert(newnode);
 	return true;
 
 }
 
-bool MapGenome::insertEdge(int id)
-{
-	GAListIter< MapNode >iter(nodeList);
-	MapNode *head = iter.head();
-
-	bool start = true;
-	// check for duplication
-	for(MapNode* i = head;i && (start || i!=head);i = iter.next())
-	{
-		start = false;
-		int nodeid = getNodeId(*i);
-		if(id == nodeid)
-			return false;
-	}
-
-	MapNode* ilist = nodeList.tail();
-	ilist->insert(id);
-}
 
 
 int MapGenome::getNodeId(MapNode& node)
@@ -131,7 +111,24 @@ void MapGenome::Init(GAGenome &g)
 			i++;		
 	}
 
-	// make random edges
+
+	// make random edges	
+	GAListIter< MapNode > iter(genome.nodeList);
+	MapNode *head = iter.head();
+	bool start = true;
+	for(MapNode *i = head; i && (start || i!=head); i = iter.next())
+	{
+		start = false;		
+		GAListIter< MapNode > iter(genome.nodeList);
+		MapNode *head = iter.head();
+		bool start = true;
+		for(MapNode *i2 = head; i2 && (start || i2!=head); i2 = iter.next())
+		{
+			start = false;
+			i->addEdge(i2->getId());
+		}
+	}
+
 }
 
 
