@@ -1,3 +1,5 @@
+#define MAXINITNODES 6
+
 
 class MapGenome : public GAListGenome< GAList<int> > {
 public:
@@ -18,8 +20,12 @@ public:
 	virtual GAGenome* clone(CloneMethod) const;
 	virtual void copy(const GAGenome& orig);
 
+	/* insert with id id
+	 * return: ptr to genome on success, NULL if fail(id already exist)
+	 */
+	MapGenome* insertNode(int id);
+	void reset();
 
-	// Data/member functions specific to this new class
 private:
 
 };

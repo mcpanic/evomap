@@ -23,12 +23,43 @@ MapGenome& MapGenome::operator=(const GAGenome& orig){
 	return *this;
 }
 
-GAGenome* MapGenome::clone(CloneMethod) const {return new MapGenome(*this);}
+GAGenome* MapGenome::clone(CloneMethod) const 
+{
+	return new MapGenome(*this);
+}
 
 void MapGenome::copy(const GAGenome& orig) {
 	// this copies all of the base genome parts
 	GAListGenome< GAList<int> >& g = (GAListGenome< GAList<int> >&)orig;
 	GAListGenome< GAList<int> >::copy(g);
+}
+
+void MapGenome::reset()
+{
+	while(head())
+		destroy();
+}
+
+MapGenome* MapGenome::insertNode(int id)
+{
+	GAListIter< GAList<int> >iter(*this);
+	GAList<int>*head = iter.head();
+
+	bool start = true;
+	for(GAList<int>* i = head;i && (start || i!=head);i = iter.next())
+	{
+		int nodeid = *(i->head());
+		if(nodeid == id)
+			return NULL;
+		if(nodeid < id)
+		{
+			warp(iter);
+			GAList<int> newnode;
+			newnode.insert(id);
+			insert(newnode,BEFORE);
+		}
+	}
+
 }
 
 
@@ -47,44 +78,17 @@ void MapGenome::Init(GAGenome &g)
 {
 	//initialize genome as a random topic map	
 	MapGenome &genome = (MapGenome&)g;
-	// genome.reset();
-
-	/// random frequency for nodes and edges	
-	double nfq = GARandomDouble();
-	double efq = GARandomDouble();
-
-	while(nfq == 0.0 || efq == 0.0)
+	genome.reset();
+	int i = 0;
+	int maxnodes = GARandomInt(0,MAXINITNODES);
+	while(i<maxnodes)
 	{
-		nfq = GARandomDouble();
-		efq = GARandomDouble();
+		// make a random, which is not alredy in the graph 
+		int id = GARandomInt(0,DICSIZE-1);
+		if(genome.insertNode(id)!=NULL)
+			i++;		
 	}
 
-	for(int i = 0; i < DICSIZE; i++)
-	{
-		if(GAFlipCoin(nfq)) 
-			genome.insertNode(i);
-	}
-
-
-	// connect edges
-	GAListIter< GAList<int> >iter(*this);
-	GAList<int>*head = iter.head();
-
-	bool start = true;
-	for(GAList<int>* i = head;i && (start || i!=head);i = iter.next())
-	{
-		start = false;
-		GAListIter<int> iter2(*i);
-		int *head = iter2.head();
-		
-		bool start = true;
-		for(int *j = head; j && (start || j!=head); j = iter2.next())
-		{
-			start = false;
-			if(GAFlipCoin(efq))
-				i->insert(*j);
-		}
-	}
 }
 
 
