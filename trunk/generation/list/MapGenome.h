@@ -1,4 +1,6 @@
 #define MAXINITNODES 6
+#define INITGRAPHSPARSITY 0.4
+
 #include "MapNode.h"
 
 class MapGenome : public GAGenome {
