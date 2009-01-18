@@ -1,6 +1,7 @@
 #define MAXINITNODES 6
+#include "MapNode.h"
 
-class MapGenome : public GAListGenome< MapNode > {
+class MapGenome : public GAGenome {
 public:
 
 	GADefineIdentity("MapGenome", 201);
@@ -18,19 +19,9 @@ public:
 	MapGenome& operator=(const GAGenome& orig);
 	virtual GAGenome* clone(CloneMethod) const;
 	virtual void copy(const GAGenome& orig);
-	virtual int equal(const GAGenome& g) const;
-	
-
-	/* insert with id id
-	 * return: true on success, false if fail(id already exist)
-	 */
-	bool insertNode(int id);
-	bool insertEdge(int id);
-	void reset();
-	static int getNodeId(GAList<int>& list);
-
-	int MutateNode(float);
-	int MutateEdge(float);
+	virtual int equal(const GAGenome& g) const {
+		return 0;
+	}
 
 	friend ostream& operator<<(ostream &os, const MapGenome & p) {
 	  os << "genome!";
@@ -38,8 +29,16 @@ public:
 
 	}
 
-
 private:
+
+	GAList<MapNode> nodeList;
+	void clear();
+	
+	bool insertNode(int id);
+	bool insertEdge(int id);
+	int getNodeId(MapNode& node);
+	int MutateNode(float);
+	int MutateEdge(float);
 
 };
 
