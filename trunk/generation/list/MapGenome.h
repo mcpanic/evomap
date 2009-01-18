@@ -31,6 +31,12 @@ public:
 	int MutateNode(float);
 	int MutateEdge(float);
 
+	friend ostream& operator<<(ostream &os, const MapGenome & p) {
+	  os << "genome!";
+		return os;
+
+	}
+
 
 private:
 

@@ -1,4 +1,9 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+#include <fstream>
 #include <ga/ga.h>
+using namespace std;
 #include "MapGenome.h"
 
 extern int DICSIZE;
@@ -186,6 +191,3 @@ int MapGenome::Cross(const GAGenome&g1, const GAGenome&g2, GAGenome*g3, GAGenome
 	// not to be implemented
 	return 0;
 }
-
-
-
