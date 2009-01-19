@@ -5,6 +5,7 @@ public:
 	MapNode(int id);
 
 	int getId();
+	void setId(int id);
 	bool addEdge(int id);
 	
 
