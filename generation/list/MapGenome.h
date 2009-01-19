@@ -57,6 +57,11 @@ private:
 
 	GAList<MapNode> nodeList;
 	void clear();
+	void purgeEdges(int id);
+	void renameAllEdges(int id, int newid);
+	int addRandomNode();
+	int removeRandomNode();
+	int renameRandomNode();
 	
 	bool insertNode(int id);
 	int getNodeId(MapNode& node);

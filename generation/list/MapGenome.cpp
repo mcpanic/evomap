@@ -84,6 +84,148 @@ int MapGenome::getNodeId(MapNode& node)
 	return *(node.head());
 }
 
+// remove all edge toward node 'id'
+void MapGenome::purgeEdges(int id)
+{
+	GAListIter< MapNode >iter(nodeList);
+	MapNode *head = iter.head();
+	bool start = true;
+
+	for(MapNode* i = head;i && (start || i!=head);i = iter.next())
+	{
+		start = false;
+		GAListIter< int > iter(*i);
+		int *head = iter.head();
+		bool start = true;
+		//for all edges
+		for(int *i2 = head; i2 && (start || i2!=head);i2 = iter.next())
+		{
+			if(*i2 == id)
+			{
+				i->warp(iter);
+				i->destroy();
+				break;
+			}
+		}
+	}
+}
+
+void MapGenome::renameAllEdges(int id, int newid)
+{
+	GAListIter< MapNode >iter(nodeList);
+	MapNode *head = iter.head();
+	bool start = true;
+
+	for(MapNode* i = head;i && (start || i!=head);i = iter.next())
+	{
+		start = false;
+		GAListIter< int > iter(*i);
+		int *head = iter.head();
+		bool start = true;
+		//for all edges
+		for(int *i2 = head; i2 && (start || i2!=head);i2 = iter.next())
+		{
+			if(*i2 == id)
+			{
+				*i2 = newid;
+				break;
+			}
+		}
+	}
+
+}
+
+int MapGenome::addRandomNode()
+{
+	int count = 0;
+	int id = GARandomInt(0,DICSIZE-1);
+	int size = nodeList.size();
+	if(insertNode(id)) 
+	{
+		size++;
+		int fromid = GARandomInt(0,size-1);
+
+		// make a random edge	
+		GAListIter< MapNode > iter(nodeList);
+		MapNode *head = iter.head();
+		bool start = true;
+		int c = 0;
+		for(MapNode *i = head; i && (start || i!=head); i = iter.next())
+		{
+			start = false;	
+			if(c == fromid) {
+				i->addEdge(id);
+				count ++;
+				break;
+			}
+			c++;
+		}
+	}
+
+	return count;
+
+}
+
+int MapGenome::removeRandomNode()
+{
+	int count = 0;
+	int size = nodeList.size();
+	int target = GARandomInt(0,size-1);
+
+	GAListIter< MapNode > iter(nodeList);
+	MapNode *head = iter.head();
+	bool start = true;
+	int c = 0;
+	for(MapNode *i = head; i && (start || i!=head); i = iter.next())
+	{
+		start = false;	
+		if(c == target) {
+			//delete this node
+			nodeList.warp(iter);
+			MapNode* target = nodeList.remove();
+			if(target!=NULL)
+			{
+				int id = target->getId();
+				delete target;
+				purgeEdges(id); //delete all edge toward this node	
+				count ++;
+			}
+		}
+		c++;
+	}
+
+	return count;
+}
+
+int MapGenome::renameRandomNode()
+{
+	int size = nodeList.size();
+	int id = GARandomInt(0,size-1);
+
+	GAListIter< MapNode > iter(nodeList);
+	MapNode *head = iter.head();
+	bool start = true;
+	int c = 0;
+	for(MapNode *i = head; i && (start || i!=head); i = iter.next())
+	{
+		start = false;	
+		if(c == id) {
+			//delete this node
+			nodeList.warp(iter);
+			MapNode* target = nodeList.remove();
+			int newid;
+			do { 
+				newid = GARandomInt(0,DICSIZE-1);
+			} while(insertNode(newid));
+
+			renameAllEdges(target->getId(), newid);
+			target->setId(newid);
+
+		}
+		c++;
+	}
+
+}
 
 /* Initialization:
  * n = rand(maxnodes)
@@ -163,61 +305,26 @@ int MapGenome::Mutate(GAGenome&g, float pMut)
 int MapGenome::MutateNode(float pMut)
 {
 	int size = nodeList.size();
+	int count = 0;
 
 	// add nodes,
 	if(GAFlipCoin(pMut / 3.0))
 	{
-		int id = GARandomInt(0,DICSIZE-1);
-		if(nodeList.insertNode(id)) 
-		{
-			size++;
-			int fromid = GARandomInt(0,size-1);
-
-			// make a random edge	
-			GAListIter< MapNode > iter(nodeList);
-			MapNode *head = iter.head();
-			bool start = true;
-			int c = 0;
-			for(MapNode *i = head; i && (start || i!=head); i = iter.next())
-			{
-				start = false;	
-				if(c == fromid) {
-					i->addEdge(id);
-					break;
-				}
-				c++;
-			}
-		}
+		count += addRandomNode();
 	}
 
 	// randomly remove a node
 	if(size > 0 && GAFlipCoin(pMut / 3.0))
 	{
+		count += removeRandomNode();
 	}
 
 	// randomly rename
 	if(size>0 && GAFlipCoin(pMut / 3.0))
 	{
-		int id = GARandomInt(0,size-1);
-
-		GAListIter< MapNode > iter(nodeList);
-		MapNode *head = iter.head();
-		bool start = true;
-		int c = 0;
-		for(MapNode *i = head; i && (start || i!=head); i = iter.next())
-		{
-			start = false;	
-			if(c == id) {
-				//delete this node
-				nodeList.warp(iter);
-				MapNode* target = nodeList.remove();
-				int newid = GARandomInt(0,size-2);
-				// THIS PART IS TO BE DONE	
-			}
-			c++;
-		}
+		count += renameRandomNode();
 	}
-	return 0;
+	return count;
 } 
 
 /* mutate edge
