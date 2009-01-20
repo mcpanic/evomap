@@ -1,6 +1,10 @@
+#ifndef __MAPGENOME_H__
+#define __MAPGENOME_H__
+
 #define MAXINITNODES 6
 #define INITGRAPHSPARSITY 0.4
 
+#include "LinkedList.h"
 #include "MapNode.h"
 
 class MapGenome : public GAGenome {
@@ -55,7 +59,7 @@ public:
 
 private:
 
-	GAList<MapNode> nodeList;
+	LinkedList<MapNode> nodeList;
 	void clear();
 	void purgeEdges(int id);
 	void renameAllEdges(int id, int newid);
@@ -63,14 +67,11 @@ private:
 	int removeRandomNode();
 	int renameRandomNode();
 	bool insertNode(int id);
+	bool insertNode(MapNode* oldnode);
 	int getNodeId(MapNode& node);
 	int MutateNode(float);
 	int MutateEdge(float);
 
 };
 
-
-
-
-
-
+#endif

@@ -1,3 +1,6 @@
+#ifndef __MAPNODE_H__
+#define __MAPNODE_H__
+
 class MapNode : public GAList<int> {
 
 public:
@@ -11,4 +14,4 @@ public:
 
 };
 
-
+#endif

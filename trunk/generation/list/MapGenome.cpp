@@ -49,37 +49,60 @@ void MapGenome::clear()
 
 bool MapGenome::insertNode(int id)
 {
-	GAListIter< MapNode >iter(nodeList);
-	MapNode *head = iter.head();
-
-	bool start = true;
-	for(MapNode* i = head;i && (start || i!=head);i = iter.next())
+	for(MapNode* i = nodeList.iterator();nodeList.hasNext(i);i = nodeList.next())
 	{
-		start = false;
 		int nodeid = i->getId();
 		if(id == nodeid)
 			return false;
 		if(id < nodeid)
 		{
-			nodeList.warp(iter);
+			nodeList.warp(nodeList.getIterator());
 			MapNode newnode(id);
-			nodeList.insert(newnode,GAListBASE::BEFORE);
+			if(i == nodeList.getIterator().head())
+				nodeList.insert(newnode,GAListBASE::HEAD);
+			else
+				nodeList.insert(newnode,GAListBASE::BEFORE);
+
 			return true;
 		}
 	}
-
 	// id > all existing node id
-	iter.tail();
-	nodeList.warp(iter);
+	nodeList.tail();
 	MapNode newnode(id);
-	nodeList.insert(newnode);
+	nodeList.insert(newnode, GAListBASE::TAIL);
 	return true;
 
 }
 
 bool MapGenome::insertNode(MapNode* oldnode)
 {
+	if(oldnode==NULL) {
+		printf("unexpected null in MapGenome::insertNode\n");
+		exit(0);
+		return false;
+	}
+
+	int id = oldnode->getId();
+	for(MapNode *i = nodeList.iterator(); nodeList.hasNext(i);i = nodeList.next())
+	{
+		int nodeid = i->getId();
+		if(id == nodeid)
+			return false;
+		if(id < nodeid)
+		{
+			nodeList.warp(nodeList.getIterator());
+			if(i == nodeList.getIterator().head())
+				nodeList.insert(*oldnode,GAListBASE::HEAD);
+			else
+				nodeList.insert(*oldnode,GAListBASE::BEFORE);
+			return true;
+		}
+	}
+	nodeList.tail();
+	nodeList.insert(*oldnode,GAListBASE::TAIL);
+
 	
+	return true;	
 }
 
 
@@ -104,13 +127,14 @@ void MapGenome::purgeEdges(int id)
 		//for all edges
 		for(int *i2 = head; i2 && (start || i2!=head);i2 = iter.next())
 		{
-			start = false;
-			if(*i2 == id)
+			if(*i2 == id && !start)
 			{
 				i->warp(iter);
 				i->destroy();
 				break;
 			}
+			start = false;
+
 		}
 	}
 }
@@ -130,12 +154,12 @@ void MapGenome::renameAllEdges(int id, int newid)
 		//for all edges
 		for(int *i2 = head; i2 && (start || i2!=head);i2 = iter.next())
 		{
-			start = false;
-			if(*i2 == id)
+			if(*i2 == id && !start)
 			{
 				*i2 = newid;
 				break;
 			}
+			start = false;
 		}
 	}
 
@@ -226,13 +250,13 @@ int MapGenome::renameRandomNode()
 			nodeList.warp(iter);
 			MapNode* target = nodeList.remove();
 			int newid;
+			int oldid = target->getId();
 			do {
 				newid = GARandomInt(0,DICSIZE-1);
-			} while(!insertNode(newid));
+				target->setId(newid);
+			} while(!insertNode(target));			
 			
-			
-			renameAllEdges(target->getId(), newid);
-			target->setId(newid);
+			renameAllEdges(oldid, newid);
 			break;
 		}
 		c++;
@@ -320,7 +344,6 @@ printf("mutated\n");
  * 1) add
  * 2) remove (remove edges toward it)
  * 3) rename
- *
  * */
 int MapGenome::MutateNode(float pMut)
 {
