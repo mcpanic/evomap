@@ -62,7 +62,6 @@ private:
 	int addRandomNode();
 	int removeRandomNode();
 	int renameRandomNode();
-	
 	bool insertNode(int id);
 	int getNodeId(MapNode& node);
 	int MutateNode(float);

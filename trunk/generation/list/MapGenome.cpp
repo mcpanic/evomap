@@ -77,6 +77,10 @@ bool MapGenome::insertNode(int id)
 
 }
 
+bool MapGenome::insertNode(MapNode* oldnode)
+{
+	
+}
 
 
 int MapGenome::getNodeId(MapNode& node)
@@ -100,6 +104,7 @@ void MapGenome::purgeEdges(int id)
 		//for all edges
 		for(int *i2 = head; i2 && (start || i2!=head);i2 = iter.next())
 		{
+			start = false;
 			if(*i2 == id)
 			{
 				i->warp(iter);
@@ -125,6 +130,7 @@ void MapGenome::renameAllEdges(int id, int newid)
 		//for all edges
 		for(int *i2 = head; i2 && (start || i2!=head);i2 = iter.next())
 		{
+			start = false;
 			if(*i2 == id)
 			{
 				*i2 = newid;
@@ -137,10 +143,12 @@ void MapGenome::renameAllEdges(int id, int newid)
 
 int MapGenome::addRandomNode()
 {
+	printf("addRandomNode\n");
+
 	int count = 0;
 	int id = GARandomInt(0,DICSIZE-1);
 	int size = nodeList.size();
-	if(insertNode(id)) 
+	if(insertNode(id))
 	{
 		size++;
 		int fromid = GARandomInt(0,size-1);
@@ -168,6 +176,8 @@ int MapGenome::addRandomNode()
 
 int MapGenome::removeRandomNode()
 {
+	printf("removeRandomNode\n");
+
 	int count = 0;
 	int size = nodeList.size();
 	int target = GARandomInt(0,size-1);
@@ -190,6 +200,7 @@ int MapGenome::removeRandomNode()
 				purgeEdges(id); //delete all edge toward this node	
 				count ++;
 			}
+			break;
 		}
 		c++;
 	}
@@ -199,6 +210,7 @@ int MapGenome::removeRandomNode()
 
 int MapGenome::renameRandomNode()
 {
+	printf("renameRandomNode\n");
 	int size = nodeList.size();
 	int id = GARandomInt(0,size-1);
 
@@ -208,19 +220,20 @@ int MapGenome::renameRandomNode()
 	int c = 0;
 	for(MapNode *i = head; i && (start || i!=head); i = iter.next())
 	{
-		start = false;	
+		start = false;
 		if(c == id) {
 			//delete this node
 			nodeList.warp(iter);
 			MapNode* target = nodeList.remove();
 			int newid;
-			do { 
+			do {
 				newid = GARandomInt(0,DICSIZE-1);
-			} while(insertNode(newid));
-
+			} while(!insertNode(newid));
+			
+			
 			renameAllEdges(target->getId(), newid);
 			target->setId(newid);
-
+			break;
 		}
 		c++;
 	}
@@ -291,7 +304,14 @@ int MapGenome::Mutate(GAGenome&g, float pMut)
 	int nMut = 0;
 
   if(pMut <= 0.0) return 0;
+	
+	cout << child << endl;
 
+	if(GAFlipCoin(pMut))
+		child.MutateNode(pMut);
+
+printf("mutated\n");
+	cout << child << endl;
 
   return nMut;
 }
@@ -308,11 +328,10 @@ int MapGenome::MutateNode(float pMut)
 	int count = 0;
 
 	// add nodes,
-	if(GAFlipCoin(pMut / 3.0))
+	if(GAFlipCoin(pMut) / 3.0)
 	{
 		count += addRandomNode();
 	}
-
 	// randomly remove a node
 	if(size > 0 && GAFlipCoin(pMut / 3.0))
 	{
@@ -324,6 +343,7 @@ int MapGenome::MutateNode(float pMut)
 	{
 		count += renameRandomNode();
 	}
+
 	return count;
 } 
 
