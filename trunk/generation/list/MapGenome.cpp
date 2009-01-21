@@ -165,6 +165,64 @@ void MapGenome::renameAllEdges(int id, int newid)
 
 }
 
+
+int MapGenome::addRandomEdge()
+{
+	int count = 0;
+	int size = nodeList.size();
+
+	// select target node
+	int target = GARandomInt(0,size-1);
+	int targetid;
+	int j = 0 ;
+	for(MapNode *i = nodeList.iterator(); nodeList.hasNext(i); i = nodeList.next())
+	{
+		if(j == target)
+		{
+			targetid = i->getId();
+			break;
+		}
+		j++;
+	}
+
+	// select source node and add target edge
+	target = GARandomInt(0,size-1);
+	j = 0;
+	for(MapNode *i = nodeList.iterator();nodeList.hasNext(i); i = nodeList.next())
+	{
+		if(j == target)
+		{
+			// same node from/to selected, abort
+			if(targetid == i->getId())
+				return 0;
+			i->addEdge(targetid);
+			break;
+		}
+	}
+	
+	printf("addRandomEdge\n");
+
+}
+
+int MapGenome::removeRandomEdge()
+{
+	// select target node
+	int target = GARandomInt(0,size-1);
+	int targetid;
+	int j = 0 ;
+	for(MapNode *i = nodeList.iterator(); nodeList.hasNext(i); i = nodeList.next())
+	{
+		if(j == target)
+		{
+			targetid = i->getId();
+			break;
+		}
+		j++;
+	}
+
+
+}
+
 int MapGenome::addRandomNode()
 {
 	printf("addRandomNode\n");
@@ -322,7 +380,7 @@ void MapGenome::Init(GAGenome &g)
  * 
  */
 int MapGenome::Mutate(GAGenome&g, float pMut)
-{
+
 	// change topic map by: add/remove node or edge
   MapGenome &child=(MapGenome &)g;
 	int nMut = 0;
@@ -376,6 +434,15 @@ int MapGenome::MutateNode(float pMut)
  */
 int MapGenome::MutateEdge(float pMut)
 {
+	
+	// add random edge
+	// remove random edge
+	
+	if(GAFlipCoin(pMut * 0.5))
+		addRandomEdge();
+	if(GAFlipCoin(pMut * 0.5))
+		removeRandomEdge();
+
 	return 0;
 } 
 
