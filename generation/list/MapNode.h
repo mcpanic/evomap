@@ -9,8 +9,8 @@ public:
 
 	int getId();
 	void setId(int id);
-	bool addEdge(int id);
-	
+	bool addEdge(int targetid);
+	void deleteEdge(int targetid);		
 
 };
 
