@@ -4,10 +4,57 @@
 #define MAXINITNODES 6
 #define INITGRAPHSPARSITY 0.4
 
-#include "LinkedList.h"
-#include "MapNode.h"
+#include "graph.h"
 
-class MapGenome : public GAGenome {
+class MapGenome : public GAGenome, public UndirectedGraph {
+public:
+
+	GAGenome* clone(CloneMethod) const 
+	{
+		return new MapGenome(*this);
+	}
+
+	MapGenome(const MapGenome& orig) { 
+		copy(orig); 
+	}
+
+	MapGenome& operator=(const GAGenome& orig){
+		if(&orig != this) copy(orig);
+		return *this;
+	}
+
+
+	void copy(const GAGenome& orig) {
+		// this copies all of the base genome parts
+		GAGenome::copy(orig);
+		MapGenome& genome = (MapGenome&)orig;
+		nodeList.copy(genome.nodeList);
+	}
+
+	virtual int equal(const GAGenome& g) const {
+		return 0;
+	}
+
+	friend ostream& operator<<(ostream &os, const MapGenome & p) {
+		
+		ListIterator<MapNode> iter(nodeList);
+		for(MapNode* i = iter.start();iter.hasNext(i);i = iter.next())
+		{
+			os << "node(" << i->getId() << ")" << endl;
+			os << "  toward: ";
+
+			GAListIter<int> iter(*i);
+			for(int *i = iter.start(); iter.hasNext(i); i = iter.next())
+			{
+				if(!iter.isStart(i)) // skip node id
+					os << *i << " ";
+			}
+			os << endl;
+		}
+
+		return os;
+	}
+
 public:
 
 	GADefineIdentity("MapGenome", 201);
@@ -16,61 +63,9 @@ public:
 	static float Evaluate(GAGenome&);
 	static int Cross(const GAGenome&, const GAGenome&, GAGenome*, GAGenome*);
 
-public:
-
-	MapGenome();
-	MapGenome(const MapGenome& orig);	
-	virtual ~MapGenome();
-
-	MapGenome& operator=(const GAGenome& orig);
-	virtual GAGenome* clone(CloneMethod) const;
-	virtual void copy(const GAGenome& orig);
-	virtual int equal(const GAGenome& g) const {
-		return 0;
-	}
-
-	friend ostream& operator<<(ostream &os, const MapGenome & p) {
-		GAListIter< MapNode >iter(p.nodeList);
-		MapNode *head = iter.head();
-		bool start = true;
-		
-		for(MapNode* i = head;i && (start || i!=head);i = iter.next())
-		{
-			start = false;
-			os << "node(" << i->getId() << ")" << endl;
-			os << "  toward: ";
-
-			GAListIter<int> iter(*i);
-			int *head = iter.head();
-			bool start = true;
-			for(int *i = head; i && (start || i!=head); i = iter.next())
-			{
-				if(!start) // skip node id
-					os << *i << " ";
-				start = false;
-			}
-			os << endl;
-		}
-
-
-		return os;
-
-	}
-
 private:
 
-	LinkedList<MapNode> nodeList;
 	void clear();
-	void purgeEdges(int id);
-	void renameAllEdges(int id, int newid);
-	int addRandomNode();
-	int removeRandomNode();
-	int renameRandomNode();
-	bool insertNode(int id);
-	bool insertNode(MapNode* oldnode);
-	int getNodeId(MapNode& node);
-	int MutateNode(float);
-	int MutateEdge(float);
 
 };
 
