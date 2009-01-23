@@ -62,14 +62,7 @@ public:
 
 	T* getNth(int n)
 	{
-		ListIterator<T> iter(*this);
-		int j = 0;
-		for(T *i = 	iter.start(); iter.hasNext(i); i = iter.next())
-		{
-			if(j == n)
-				return i;
-		}
-		return NULL;
+		return GAList<T>::warp(n);
 	}
 
 	bool remove(T& removee)
@@ -88,21 +81,9 @@ public:
 
 	bool removeNth(int n)
 	{
-		ListIterator<T> iter(*this);
-		int j = 0;
-		for(T *i = iter.start(); iter.hasNext(i); i = iter.next())
-		{
-			if(j == n)
-			{
-				warp(iter);
-				GAList<T>::destroy();
-				return true;
-			}
-			if(j > n)
-				return false;
-			j++;
-		}
-		return false;
+		GAList<T>::warp(n);
+		GAList<T>::destroy();
+		return true;
 		
 	}
 

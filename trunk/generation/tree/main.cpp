@@ -22,7 +22,7 @@ public:
 	Word word() const { return _word; }
 	Word word(Word val) { return _word = val; }
 
-	friend ostream & operator<<(ostream & os, const Topic & p){
+	friend ostream& operator<<(ostream & os, const Topic & p){
 	os << "[" << p._word << "]";
 	return os;
 	}
