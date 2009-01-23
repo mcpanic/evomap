@@ -130,6 +130,7 @@ int MapGenome::mutateEdge(float pMut)
 } 
 
 int MapGenome::addRandomNode() {
+
 	return 0;
 }
 

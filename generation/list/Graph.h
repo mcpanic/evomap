@@ -47,7 +47,7 @@ class UndirectedGraph {
 		}
 
 		void deleteNthNode(int n) {
-			MapNode *target = nodeList.getNth(n);
+			MapNode *target = nodeList.warp(n);
 			deleteNode(target->getId()); // this part is duplicating search to the target, might be inefficient..
 		}
 
