@@ -63,9 +63,9 @@ void MapGenome::Init(GAGenome &g)
  * 
  */
 int MapGenome::Mutate(GAGenome&g, float pMut)
-
+{
 	// change topic map by: add/remove node or edge
-  MapGenome &child = (MapGenome &)g;
+  MapGenome &child = (MapGenome&)g;
 	int nMut = 0;
 
   if(pMut <= 0.0) return 0;

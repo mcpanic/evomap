@@ -64,7 +64,7 @@ public:
 	{
 		ListIterator<T> iter(*this);
 		int j = 0;
-		for(T *i = 	iter.start(); iter.hasNext(); i = iter.next())
+		for(T *i = 	iter.start(); iter.hasNext(i); i = iter.next())
 		{
 			if(j == n)
 				return i;
@@ -75,7 +75,7 @@ public:
 	bool remove(T& removee)
 	{
 		ListIterator<T> iter(*this);
-		for(T *i = 	iter.start(); iter.hasNext(); i = iter.next())
+		for(T *i = 	iter.start(); iter.hasNext(i); i = iter.next())
 		{
 			if(removee == *i) {
 				warp(iter);
@@ -90,7 +90,7 @@ public:
 	{
 		ListIterator<T> iter(*this);
 		int j = 0;
-		for(T *i = iter.start(); iter.hasNext(); i = iter.next())
+		for(T *i = iter.start(); iter.hasNext(i); i = iter.next())
 		{
 			if(j == n)
 			{
@@ -126,7 +126,7 @@ class SortedLinkedList : public LinkedList<T>
  	T* find(const T& target)
 	{
 		ListIterator<T> iter(*this);
-		for(T *i = iter.start(); iter.hasNext(); i = iter.next())
+		for(T *i = iter.start(); iter.hasNext(i); i = iter.next())
 		{
 			if(target == *i)
 				return i;
@@ -140,7 +140,7 @@ class SortedLinkedList : public LinkedList<T>
 	bool insert(const T& insertee)
 	{
 		ListIterator<T> iter(*this);
-		for(T *i = 	iter.start(); iter.hasNext(); i = iter.next())
+		for(T *i = 	iter.start(); iter.hasNext(i); i = iter.next())
 		{
 			if(insertee == *i)		
 				return false;
@@ -162,7 +162,7 @@ class SortedLinkedList : public LinkedList<T>
 	bool remove(const T& removee)
 	{
 		ListIterator<T> iter(*this);
-		for(T *i = 	iter.start(); iter.hasNext(); i = iter.next())
+		for(T *i = 	iter.start(); iter.hasNext(i); i = iter.next())
 		{
 			if(removee == *i) {
 				LinkedList<T>::warp(iter);
