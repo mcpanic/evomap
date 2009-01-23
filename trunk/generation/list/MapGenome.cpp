@@ -38,32 +38,18 @@ void MapGenome::Init(GAGenome &g)
 	//initialize genome as a random topic map	
 	MapGenome &genome = (MapGenome&)g;
 	genome.clear();
+
 	int i = 0;
 	int maxnodes = GARandomInt(0,MAXINITNODES);
 	while(i<maxnodes)
 	{
 		// make a random node, which is not alredy in the graph 
 		int id = GARandomInt(0,DICSIZE-1);
-		if(genome.insert(id))
+		if(genome.addNode(id))
 			i++;		
 	}
-
-	// make random edges	
-	bool start = true;
-	for(MapNode *i = head; i && (start || i!=head); i = iter.next())
-	{
-		start = false;		
-		GAListIter< MapNode > iter(genome.nodeList);
-		MapNode *head = iter.head();
-		bool start = true;
-		for(MapNode *i2 = head; i2 && (start || i2!=head); i2 = iter.next())
-		{
-			start = false;
-			// flip coin here
-			if(GAFlipCoin(INITGRAPHSPARSITY))
-				i->addEdge(i2->getId());
-		}
-	}
+	
+	// make random edges
 
 }
 
@@ -79,7 +65,7 @@ void MapGenome::Init(GAGenome &g)
 int MapGenome::Mutate(GAGenome&g, float pMut)
 
 	// change topic map by: add/remove node or edge
-  MapGenome &child=(MapGenome &)g;
+  MapGenome &child = (MapGenome &)g;
 	int nMut = 0;
 
   if(pMut <= 0.0) return 0;
@@ -87,9 +73,9 @@ int MapGenome::Mutate(GAGenome&g, float pMut)
 	cout << child << endl;
 
 	if(GAFlipCoin(pMut))
-		child.MutateNode(pMut);
+		child.mutateNode(pMut);
 
-printf("mutated\n");
+	printf("mutated\n");
 	cout << child << endl;
 
   return nMut;
@@ -100,16 +86,17 @@ printf("mutated\n");
  * 2) remove (remove edges toward it)
  * 3) rename
  * */
-int MapGenome::MutateNode(float pMut)
+int MapGenome::mutateNode(float pMut)
 {
 	int size = nodeList.size();
 	int count = 0;
 
-	// add nodes,
+	// add nodes
 	if(GAFlipCoin(pMut) / 3.0)
 	{
 		count += addRandomNode();
 	}
+
 	// randomly remove a node
 	if(size > 0 && GAFlipCoin(pMut / 3.0))
 	{
@@ -129,12 +116,11 @@ int MapGenome::MutateNode(float pMut)
  * 1) add
  * 2) remove
  */
-int MapGenome::MutateEdge(float pMut)
+int MapGenome::mutateEdge(float pMut)
 {
 	
 	// add random edge
-	// remove random edge
-	
+	// remove random edge	
 	if(GAFlipCoin(pMut * 0.5))
 		addRandomEdge();
 	if(GAFlipCoin(pMut * 0.5))
@@ -142,6 +128,27 @@ int MapGenome::MutateEdge(float pMut)
 
 	return 0;
 } 
+
+int MapGenome::addRandomNode() {
+	return 0;
+}
+
+int MapGenome::removeRandomNode() {
+	return 0;
+}
+
+int MapGenome::renameRandomNode() {
+	return 0;
+}
+
+int MapGenome::addRandomEdge() {
+	return 0;
+}
+
+int MapGenome::removeRandomEdge() {
+	return 0;
+}
+
 
 float MapGenome::Evaluate(GAGenome&g)
 {

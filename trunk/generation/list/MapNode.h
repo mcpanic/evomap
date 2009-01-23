@@ -8,17 +8,15 @@ class MapNode : public LinkedList<int> {
 public:
 	// create node with the node id
 	MapNode(int id) {
-		insert(id);
+		nodeId = id;
 	}
 
-	int getId() {
-		return *head();
+	int getId() const {
+		return nodeId;
 	}
 
 	void setId(int id) {
-		int *h = head();
-		if(h!=NULL)
-			*h = id;
+		nodeId = id;
 	}
 
 	bool addEdge(int targetid)
@@ -28,27 +26,31 @@ public:
 		// check for duplication
 		for(int* i = iter.start();iter.hasNext(i); i = iter.next())
 		{
-			if(*i == id)
+			if(*i == targetid)
 				return false;
 		}
 
 		// actual insertion
 		this->tail();
-		this->insert(id);
-
+		this->insert(targetid);
 	}
 
-	void deleteEdge(int targetid);
+	bool deleteEdge(int targetid) {
+		return remove(targetid);
+	}
 
 	bool operator==(const MapNode& other) const 
 	{
 		return getId() == other.getId();
 	}
 	
-	bool operator<(const A& other) const
+	bool operator<(const MapNode& other) const
 	{
 		return getId() < other.getId();
 	}
+	
+	private:
+		int nodeId;
 
 };
 

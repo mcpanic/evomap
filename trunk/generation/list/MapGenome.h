@@ -4,10 +4,12 @@
 #define MAXINITNODES 6
 #define INITGRAPHSPARSITY 0.4
 
-#include "graph.h"
+#include "Graph.h"
 
 class MapGenome : public GAGenome, public UndirectedGraph {
 public:
+
+	MapGenome();
 
 	GAGenome* clone(CloneMethod) const 
 	{
@@ -37,13 +39,13 @@ public:
 
 	friend ostream& operator<<(ostream &os, const MapGenome & p) {
 		
-		ListIterator<MapNode> iter(nodeList);
+		ListIterator<MapNode> iter(p.nodeList);
 		for(MapNode* i = iter.start();iter.hasNext(i);i = iter.next())
 		{
 			os << "node(" << i->getId() << ")" << endl;
 			os << "  toward: ";
 
-			GAListIter<int> iter(*i);
+			ListIterator<int> iter(*i);
 			for(int *i = iter.start(); iter.hasNext(i); i = iter.next())
 			{
 				if(!iter.isStart(i)) // skip node id
@@ -66,6 +68,15 @@ public:
 private:
 
 	void clear();
+
+	int mutateNode(float pMut);
+	int mutateEdge(float pMut);
+	int addRandomNode();
+	int removeRandomNode();
+	int renameRandomNode();
+	int addRandomEdge();
+	int removeRandomEdge();
+
 
 };
 
