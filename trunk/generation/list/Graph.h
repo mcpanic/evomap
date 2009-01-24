@@ -83,6 +83,7 @@ class UndirectedGraph {
 			deleteUnconnectedNodes();
 		}
 
+
 	public:
 		void deleteUnconnectedNodes() {
 			bool found = true;
@@ -102,6 +103,19 @@ class UndirectedGraph {
 				}
 			}
 		}
+
+		void renameEdges(int oldid, int newid) {
+			ListIterator< MapNode> iter(nodeList);
+			for( MapNode *i = iter.start(); iter.hasNext(i); i = iter.next())
+			{
+				printf("ren(%d)",i->getId());
+				i->renameEdges(oldid, newid);
+			}
+			printf("\n");
+					
+		}
+
+
 };
 
 

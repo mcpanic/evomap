@@ -150,6 +150,11 @@ class SortedLinkedList : public LinkedList<T>
 		return LinkedList<T>::tail();
 	}
 
+ 	T * remove() {
+		return GAList<T>::remove();
+	}
+
+
 	bool remove(const T& removee)
 	{
 		ListIterator<T> iter(*this);
@@ -165,6 +170,8 @@ class SortedLinkedList : public LinkedList<T>
 		}
 		return false;	
 	}
+
+
 
 
 	private:

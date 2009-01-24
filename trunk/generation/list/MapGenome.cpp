@@ -108,19 +108,22 @@ int MapGenome::mutateNode(float pMut)
 	// add nodes
 	if(GAFlipCoin(pMut) / 3.0)
 	{
+		fprintf(stderr,"add\n");
 		count += addRandomNode();
 	}
 
 	// randomly remove a node
 	if(GAFlipCoin(pMut / 3.0))
 	{
+		fprintf(stderr,"remove\n");
 		count += removeRandomNode();
 	}
 
 	// randomly rename
 	if(size>0 && GAFlipCoin(pMut / 3.0))
 	{
-		//count += renameRandomNode();
+		fprintf(stderr,"rename\n");
+		count += renameRandomNode();
 	}
 
 	return count;
@@ -197,9 +200,28 @@ int MapGenome::removeRandomNode() {
 
 int MapGenome::renameRandomNode() {
 	//choose a random node
+	int n = GARandomInt(0,nodeList.size()-1);
+	// set node id to a different one(must be unique)
+	int newid;
+	do {
+		newid = GARandomInt(0, DICSIZE-1);
 			
+	}while(findNode(newid)!=NULL);
+	// rename all edges 
 
-	return 0;
+	nodeList.warp(n);
+	MapNode *t = nodeList.remove();
+	if(t==NULL){
+		fprintf(stderr,"removee is null\n");
+		return 0;
+	}
+	printf("rename %d->%d",t->getId(),newid);
+	renameEdges(t->getId(),newid);
+	t->setId(newid);
+	nodeList.insert(*t);
+	delete t;
+
+	return 1;
 }
 
 int MapGenome::addRandomEdge() {
