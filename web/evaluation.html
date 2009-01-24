@@ -1,0 +1,81 @@
+<html>
+<head>
+	<title>Evomap Evaluation</title>
+	<script type="text/javascript" src="lib/processing.js"></script>
+	<script type="text/javascript" src="lib/treeview.js"></script>
+	<script type="text/javascript">
+		function draw(evomapId)
+		{
+			displayTree('test.xml', evomapId, 600, 400);
+		}
+
+		function validate(thisForm)
+		{
+			with (thisForm)
+			{
+				// not an integer
+				if (parseInt(eval.value) != eval.value - 0)
+				{
+					alert("Evaluation value should be an integer.");
+					return false;
+				}
+				// integer out of range
+				if (eval.value < 0 || eval.value > 100)
+				{
+					alert("Evaluation value should be integers from 0 to 100.");
+					return false;
+				}
+			}
+		}
+	</script>
+	<style type="text/css">
+	body {
+		font-family: Tahoma;
+		font-size: 14px;
+		background-color: #d8da3d;
+	}
+	#interactions {
+		font-size: smaller;
+		position: absolute;
+		right: 30px;
+		top: 100px;
+	}
+	</style>
+</head>
+
+<body>
+	<h2>Map # at Generation #</h2>	
+	<div id="header">
+		Please evaluate maps in scale of 0 to 100. <br />
+		0 means the map is completely incomprehensible, consisting of only irrelevant words.<br />
+		100 means the map consists fully of relative words, suggesting useful knowledge or meanings.<br /><br />
+	</div>
+	
+	<form name="eval_form" action="" onsubmit="return validate(this)" method="POST">
+
+	<div id="canvas" class="canvas">
+		<canvas id="evomap" class="evomap"></canvas>
+		<script type="text/javascript">draw('evomap');</script>
+		<br />
+		Your evaluation (0-100): <input id="eval" name="eval" type="text" size="4" value="0" />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="submit" value="Submit Evaluation" /><br/>
+		<input type="button" value="Expand all" onClick="expandAll()"/>
+		<input type="button" value="Collapse all" onClick="collapseAll()"/><br/>
+	
+	</div>
+	</form>	
+	
+	<div id="interactions">	
+	<h3>Interactions</h3>
+	* L-click the node: expand & collapse <br/>
+	* L-click the empty space: dance!<br/>	
+	* L-click & drag the empty space: panning<br/>
+	* R-click the node: open URL<br/>
+	* R-click the empty space: zoom to fit <br/>
+	* R-click & drag the empty space: zoom<br/>
+	* Drag node: move the node<br/>
+	</div>
+
+</body>
+</html>
