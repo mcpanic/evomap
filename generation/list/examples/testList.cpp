@@ -41,10 +41,13 @@ int main(int argc, char* argv[])
 	iter.head();
 	iter.next();
 	ilist.warp(iter);
-	ilist.insert(11);
+	ilist.insert(9,GAListBASE::BEFORE);
+	int *t = ilist.current();
+	printf("%d\n", *t);
+
 	list.insert(ilist);
 
-	printList(list);
+	//printList(list);
 
 }
 

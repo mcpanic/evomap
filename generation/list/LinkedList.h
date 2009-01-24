@@ -16,6 +16,9 @@ class ListIterator : public GAListIter<T> {
 
 	T *start()
 	{
+		starting = true;
+		theHead = GAListIter<T>::head();
+
 		return theHead;
 	}
 
@@ -25,12 +28,12 @@ class ListIterator : public GAListIter<T> {
 
 	bool hasNext(T *i) {
 		bool rval = i && (starting || i!=theHead);
-		starting = false;
 		return rval;
 	}
 
 	T *next()
 	{
+		starting = false;
 		return GAListIter<T>::next();
 	}
 
@@ -89,8 +92,8 @@ public:
 
 
 	friend ostream& operator<<(ostream &os, const LinkedList<T>& p) {
-		LinkedList<T> t(p);
-		for(T *i = t.iterator();t.hasNext(i);i = t.next())
+		ListIterator<T> iter(p);
+		for(T *i = iter.start();iter.hasNext(i);i = iter.next())
 		{
 			os << *i << " ";
 		}
@@ -109,35 +112,43 @@ class SortedLinkedList : public LinkedList<T>
 		ListIterator<T> iter(*this);
 		for(T *i = iter.start(); iter.hasNext(i); i = iter.next())
 		{
+			//printf("%d %d\n", target.getId(),i->getId());
 			if(target == *i)
 				return i;
-			if(*i < target) // assuming sorted list, no need to go further
+			
+			if(target < *i) // assuming sorted list, no need to go further
 				return NULL;
 		}
 		return NULL;
 	}
 
 	// insert T t with order
-	bool insert(const T& insertee)
+	T* insert(const T& insertee)
 	{
 		ListIterator<T> iter(*this);
 		for(T *i = 	iter.start(); iter.hasNext(i); i = iter.next())
 		{
-			if(insertee == *i)		
-				return false;
+			if(insertee == *i)
+			{
+				return NULL;
+			}
 			if(insertee < *i)
 			{
 				warp(iter);
-				if(iter.isStart(i))
+				if(iter.isStart(i)) {
 					LinkedList<T>::insert(insertee, GAListBASE::HEAD);
-				else
+					return LinkedList<T>::head();
+				}
+				else {
 					LinkedList<T>::insert(insertee, GAListBASE::BEFORE);
-				return true;
+					return LinkedList<T>::current();
+				}
 			}
 		}
 		
 		LinkedList<T>::tail();
 		LinkedList<T>::insert(insertee, GAListBASE::TAIL);
+		return LinkedList<T>::tail();
 	}
 
 	bool remove(const T& removee)
