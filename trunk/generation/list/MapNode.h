@@ -28,7 +28,6 @@ public:
 		{
 			if(*i == targetid)
 			{
-				printf("%d->%d already exists?\n", getId(), targetid);
 				return false;
 			}
 		}
