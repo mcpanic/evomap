@@ -112,7 +112,6 @@ class SortedLinkedList : public LinkedList<T>
 		ListIterator<T> iter(*this);
 		for(T *i = iter.start(); iter.hasNext(i); i = iter.next())
 		{
-			//printf("%d %d\n", target.getId(),i->getId());
 			if(target == *i)
 				return i;
 			
@@ -161,7 +160,7 @@ class SortedLinkedList : public LinkedList<T>
 				LinkedList<T>::destroy();
 				return true;
 			}
-			if(*i < removee) // assuming sorted list, no need to go further
+			if(removee < *i) // assuming sorted list, no need to go further
 				return false;
 		}
 		return false;	

@@ -38,7 +38,6 @@ void MapGenome::Init(GAGenome &g)
 	//initialize genome as a random topic map	
 	MapGenome &genome = (MapGenome&)g;
 	genome.clear();
-	printf("initializing\n");
 	int i = 0;
 	int maxnodes = GARandomInt(2,MAXINITNODES);
 	while(i<maxnodes)
@@ -59,7 +58,7 @@ void MapGenome::Init(GAGenome &g)
 			if(i!=j && GAFlipCoin(INITGRAPHSPARSITY))
 			{
 				if(i->addEdge(j->getId()) ^	j->addEdge(i->getId()))
-					printf("connection irregular\n");
+					fprintf(stderr,"connection irregular\n");
 			}
 		}
 	}
@@ -113,9 +112,9 @@ int MapGenome::mutateNode(float pMut)
 	}
 
 	// randomly remove a node
-	if(size > 0 && GAFlipCoin(pMut / 3.0))
+	if(GAFlipCoin(pMut / 3.0))
 	{
-	//	count += removeRandomNode();
+		count += removeRandomNode();
 	}
 
 	// randomly rename
@@ -148,6 +147,7 @@ int MapGenome::addRandomNode() {
 	// make a node with random id
 	MapNode* f;
 	int newid;
+	int count  = 0;
 
 	bool more = true;
 
@@ -159,10 +159,8 @@ int MapGenome::addRandomNode() {
 			newid = GARandomInt(0, DICSIZE-1);
 		}
 		while((f = addNode(newid))==NULL);
-		printf("added node %d\n", f->getId());
 	
-		if(size != nodeList.size()-1)
-			printf("ERRRRRRRRRRRRRRR\n");
+		count ++;
 
 		// we need at least two nodes
 		if(nodeList.size()<=1)
@@ -178,32 +176,34 @@ int MapGenome::addRandomNode() {
 			t = nodeList.warp(GARandomInt(0,nodeList.size()-1));
 			
 		}	while(t->getId()==f->getId());
-	printf("adding edge %d-%d\n", f->getId(),t->getId());
 
-		if(addEdge(t->getId(),f->getId()))
-		{
-		}
+		addEdge(t->getId(),f->getId());
+		
+		
 	}
-		//f->addEdge(t->getId());
-	//qt->addEdge(f->getId());
 	
 
-	return 0;
+	return count;
 }
 
 int MapGenome::removeRandomNode() {
+	if(nodeList.size()<=2)
+		return 0;
+
+	deleteNthNode(GARandomInt(0,nodeList.size()-1));	
 	// choose a random node, and delete
 	return 0;
 }
 
 int MapGenome::renameRandomNode() {
 	//choose a random node
-	//
+			
 
 	return 0;
 }
 
 int MapGenome::addRandomEdge() {
+	
 	return 0;
 }
 

@@ -37,10 +37,6 @@ class UndirectedGraph {
 
 			if(from == NULL || to == NULL)
 			{
-				if(from == NULL)
-					printf("from is null\n");
-				if(to == NULL)
-					printf("to is null\n");
 				return false;
 			}
 			
@@ -84,6 +80,7 @@ class UndirectedGraph {
 			{
 				i->deleteEdge(nodeid);
 			}
+			deleteUnconnectedNodes();
 		}
 
 	public:
@@ -97,15 +94,13 @@ class UndirectedGraph {
 				{
 					if(i->size() == 0)
 					{
-						printf("destroying");
 						nodeList.warp(iter);
 						nodeList.destroy();
 						found = true;
 						break;
 					}
-					}
-					printf("\n");
 				}
+			}
 		}
 };
 
