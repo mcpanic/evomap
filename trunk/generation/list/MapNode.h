@@ -27,26 +27,40 @@ public:
 		for(int* i = iter.start();iter.hasNext(i); i = iter.next())
 		{
 			if(*i == targetid)
+			{
+				printf("%d->%d already exists?\n", getId(), targetid);
 				return false;
+			}
 		}
 
 		// actual insertion
 		this->tail();
 		this->insert(targetid);
+		return true;
 	}
 
 	bool deleteEdge(int targetid) {
 		return remove(targetid);
 	}
 
-	bool operator==(const MapNode& other) const 
+	friend bool operator==(const MapNode& a, const MapNode& b) 
 	{
-		return getId() == other.getId();
+		return a.getId() == b.getId();
 	}
 	
-	bool operator<(const MapNode& other) const
+	friend bool operator<(const MapNode& a, const MapNode &b)
 	{
-		return getId() < other.getId();
+		return a.getId() < b.getId();
+	}
+
+	friend bool operator>(const MapNode& a,const MapNode& b)
+	{
+		return a.getId() > b.getId();
+	}
+
+	friend ostream& operator<<(ostream &os, const MapNode& p) {
+		os << p.getId();
+		return os;
 	}
 	
 	private:

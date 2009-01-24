@@ -48,7 +48,7 @@ public:
 			ListIterator<int> iter(*i);
 			for(int *i = iter.start(); iter.hasNext(i); i = iter.next())
 			{
-				if(!iter.isStart(i)) // skip node id
+				//if(!iter.isStart(i)) // skip node id
 					os << *i << " ";
 			}
 			os << endl;

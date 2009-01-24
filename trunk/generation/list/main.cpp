@@ -17,12 +17,11 @@ int main(int argc, char* argv[])
 	MapGenome genome;
 
 	MapGenome::Init(genome);
-	cout << genome << endl;
 
 
 	// Define GA
 	GASteadyStateGA ga(genome);
-	ga.populationSize(10);
+	ga.populationSize(1);
 	ga.nGenerations(10);
 	ga.pMutation(1.0);
 	ga.set(gaNpCrossover, 0.0);

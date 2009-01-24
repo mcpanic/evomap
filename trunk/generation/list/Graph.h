@@ -23,20 +23,30 @@ class UndirectedGraph {
 
 		MapNode* findNode(int id)
 		{
-			nodeList.find(id);
+			return nodeList.find(id);
 		}
 
-		bool addNode(int id) {
+		MapNode* addNode(int id) {
 			return nodeList.insert(id);
 		}
 
 		bool addEdge(int fromid, int toid) {
+			
 			MapNode* from = findNode(fromid);
 			MapNode* to = findNode(toid);
+
 			if(from == NULL || to == NULL)
-				return false;			
+			{
+				if(from == NULL)
+					printf("from is null\n");
+				if(to == NULL)
+					printf("to is null\n");
+				return false;
+			}
+			
 			from->addEdge(toid);
 			to->addEdge(fromid);
+			return true;
 		}
 
 		void deleteNode(int id)
@@ -74,6 +84,28 @@ class UndirectedGraph {
 			{
 				i->deleteEdge(nodeid);
 			}
+		}
+
+	public:
+		void deleteUnconnectedNodes() {
+			bool found = true;
+			while(found)
+			{
+				found = false;
+				ListIterator< MapNode> iter(nodeList);
+				for( MapNode *i = iter.start(); iter.hasNext(i); i = iter.next())
+				{
+					if(i->size() == 0)
+					{
+						printf("destroying");
+						nodeList.warp(iter);
+						nodeList.destroy();
+						found = true;
+						break;
+					}
+					}
+					printf("\n");
+				}
 		}
 };
 
