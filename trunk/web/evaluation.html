@@ -44,7 +44,7 @@
 </head>
 
 <body>
-	<h2>Map # at Generation #</h2>	
+	<h2>Map [current_map_id] at Generation [current_generation]</h2>	
 	<div id="header">
 		Please evaluate maps in scale of 0 to 100. <br />
 		0 means the map is completely incomprehensible, consisting of only irrelevant words.<br />
@@ -57,9 +57,12 @@
 		<canvas id="evomap" class="evomap"></canvas>
 		<script type="text/javascript">draw('evomap');</script>
 		<br />
+		<input type="hidden" name="gen" value="[current_generation]" />
+		<input type="hidden" name="map_id" value="[current_map_id]" />
 		Your evaluation (0-100): <input id="eval" name="eval" type="text" size="4" value="0" />
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		<input type="submit" value="Submit Evaluation" /><br/>
+
 		<input type="button" value="Expand all" onClick="expandAll()"/>
 		<input type="button" value="Collapse all" onClick="collapseAll()"/><br/>
 	
