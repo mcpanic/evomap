@@ -42,6 +42,18 @@ public:
 		return remove(targetid);
 	}
 
+	void renameEdges(int oldid, int newid)
+	{
+		ListIterator<int> iter(*this);
+		for(int *i = iter.start(); iter.hasNext(i); iter.next())
+		{
+			printf("[%d]",*i);
+			if(*i == oldid){
+				*i = newid;
+			}
+		}
+	}
+
 	friend bool operator==(const MapNode& a, const MapNode& b) 
 	{
 		return a.getId() == b.getId();
