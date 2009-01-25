@@ -78,6 +78,12 @@ private:
 	int removeRandomEdge();
 	void migrateNode(MapNode& target, MapGenome&other); 
 
+	UndirectedGraph* getRandomSubgraph(MapNode** root);
+	void _getSubgraph(int, UndirectedGraph&);
+
+
+
+
 
 };
 

@@ -312,40 +312,69 @@ int MapGenome::Cross(const GAGenome&p1, const GAGenome&p2, GAGenome*c1, GAGenome
 		MapGenome& sis = (MapGenome&)*c2;
 		bro.copy(p1);
 		sis.copy(p2);
-		// bro's node is exchanged with sis's node
-		// adjacent nodes are selected and copied, and edges retained
-		MapNode* k1 = bro.nodeList.warp(GARandomInt(0,bro.nodeList.size()-1));
-		bro.migrateNode(*k1, sis);	
-		MapNode* k2 = sis.nodeList.warp(GARandomInt(0,sis.nodeList.size()-1));
-		sis.migrateNode(*k2, bro);
+		
+		MapNode *bro_arm_root, *sis_arm_root;// roots
+		UndirectedGraph *bro_arm = bro.getRandomSubgraph(&bro_arm_root);
+		UndirectedGraph *sis_arm = sis.getRandomSubgraph(&sis_arm_root);
+
+		bro.subtract(*bro_arm);
+		sis.subtract(*sis_arm);
+
+		int broid = bro_arm_root->getId();
+		int sisid = sis_arm_root->getId();
+		bro_arm->renameNode(broid, sisid);
+		sis_arm->renameNode(sisid, broid);
+
+		bro.combine(*sis_arm);
+		sis.combine(*bro_arm);
+
+		delete sis_arm;
+		delete bro_arm;
+	
 		return 2;
 	}
 
 	return 0;
 }
 
-void MapGenome::migrateNode(MapNode& migratee, MapGenome& newgraph)
+UndirectedGraph* MapGenome::getRandomSubgraph(MapNode** root)
 {
-	MapNode* newnode = newgraph.findNode(migratee.getId());
-	// if node with targetid already exists: exchange edges only
-	// if not, create
-	if(newnode == NULL)
-		newnode = newgraph.addNode(migratee.getId());
+	// * declare a graph
+	// * choose random node as root
+	// * from this node, extract and put it in new graph
+	// * do it recursively for each outgoing node
 	
-	ListIterator<int> iter(migratee);
-	for(int *i = iter.start();iter.hasNext(i);i = iter.next())
+	int size = nodeList.size();
+	UndirectedGraph *newgraph = new UndirectedGraph();
+	MapNode *rootNode = nodeList.warp(GARandomInt(0,size-1));  // select random node
+	
+	MapNode* newroot = newgraph->addNode(rootNode->getId()); //save node
+
+	// save edges
+	ListIterator<int> iter(*newroot);
+	for(int* i = iter.start();iter.hasNext(i);i = iter.next())
 	{
-		if(GAFlipCoin(0.4)) {
-			MapNode* target = findNode(*i);
-			if(target == NULL)
-				printf("node with id %d not found\n",*i);
-			migrateNode(*target,newgraph);
-	
-			newgraph.addEdge(newnode->getId(),*i);	
+		if(GAFlipCoin(0.7)) {
+			newroot->addEdge(*i);
 		}
 	}
 
-	// after copying is done, remove node from current graph
-	deleteNode(migratee.getId());
+	*root = rootNode; // return value
 
+	return newgraph;
+}
+
+void MapGenome::_getSubgraph(int rootid, UndirectedGraph& newgraph)
+{
+	MapNode *newroot = findNode(rootid);
+	newgraph.addNode(rootid);// save node
+
+	ListIterator<int> iter(*newroot);
+	for(int* i = iter.start();iter.hasNext(i);i = iter.next())
+	{
+		if(GAFlipCoin(0.7)) { // selectively save edge and adjacent node
+			newroot->addEdge(*i);
+			_getSubgraph(*i,newgraph); 
+		}
+	}
 }
