@@ -45,7 +45,7 @@ public:
 	void renameEdges(int oldid, int newid)
 	{
 		ListIterator<int> iter(*this);
-		for(int *i = iter.start(); iter.hasNext(i); iter.next())
+		for(int *i = iter.start(); iter.hasNext(i); i = iter.next())
 		{
 			printf("[%d]",*i);
 			if(*i == oldid){
