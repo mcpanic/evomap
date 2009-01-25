@@ -10,8 +10,6 @@ class ListIterator : public GAListIter<T> {
 	ListIterator(const GAList<T> &list)
 	: GAListIter<T>(list)
 	{
-		starting = true;
-		theHead = GAListIter<T>::head();
 	}
 
 	T *start()
