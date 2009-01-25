@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
 	ga.populationSize(10);
 	ga.nGenerations(1000);
 	ga.pMutation(1.0);
-	ga.set(gaNpCrossover, 1.0);
+	ga.set(gaNpCrossover, 0.2);
 	// Evolve
 	ga.evolve();
 }

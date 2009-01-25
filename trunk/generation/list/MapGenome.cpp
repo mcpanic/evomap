@@ -316,6 +316,9 @@ int MapGenome::Cross(const GAGenome&p1, const GAGenome&p2, GAGenome*c1, GAGenome
 		MapGenome& sis = (MapGenome&)*c2;
 		bro.copy(p1);
 		sis.copy(p2);
+
+		if(((MapGenome&)p1).nodeList.size() == 0 || ((MapGenome&)p2).nodeList.size() == 0)
+			return 0;
 		
 		MapNode *bro_arm_root, *sis_arm_root;// roots
 		UndirectedGraph *bro_arm = bro.getRandomSubgraph(&bro_arm_root);
@@ -344,6 +347,12 @@ int MapGenome::Cross(const GAGenome&p1, const GAGenome&p2, GAGenome*c1, GAGenome
 
 		delete sis_arm;
 		delete bro_arm;
+
+		if(bro.nodeList.size() == 0 || sis.nodeList.size() == 0)
+		{
+			printf("error, no node\n");
+			exit(0);
+		}
 
 		cout << bro << endl;
 		cout << sis << endl;
