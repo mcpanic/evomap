@@ -74,17 +74,21 @@ class UndirectedGraph {
 	private:
 
 		// delete all edges involving node with nodeid ( complexity: n * e)
-		void purgeEdges(int nodeid) {
+		void purgeEdges(int nodeid,bool delUnconnectedNodes = true) {
 			ListIterator< MapNode> iter(nodeList);
 			for( MapNode *i = iter.start(); iter.hasNext(i); i = iter.next())
 			{
 				i->deleteEdge(nodeid);
 			}
-			deleteUnconnectedNodes();
+			if(delUnconnectedNodes)
+				deleteUnconnectedNodes();
 		}
 
 
 	public:
+
+	
+
 		void deleteUnconnectedNodes() {
 			bool found = true;
 			while(found)
@@ -113,9 +117,47 @@ class UndirectedGraph {
 					
 		}
 
+		bool renameNode(int oldid, int newid)
+		{
+			MapNode* node = findNode(oldid);
+			if(node == NULL)
+				return false;
+			if(findNode(newid)) // newid must not exist
+				return false;
+			renameEdges(oldid, newid);
+			node->setId(newid);
+			return true;
+		}
+
+		void subtract(UndirectedGraph& hole)
+		{
+			ListIterator<MapNode> iter(hole.nodeList);
+			for(MapNode *i = iter.start(); iter.hasNext(i); i = iter.next())
+			{
+				deleteNode(i->getId());
+			}
+		}
+
+		void combine(UndirectedGraph& addition)
+		{
+			ListIterator<MapNode> iter(addition.nodeList);
+			for(MapNode *i = iter.start(); iter.hasNext(i); i = iter.next())
+			{
+				// combine node
+				MapNode* mynode = findNode(i->getId());
+				if(mynode ==NULL)
+					mynode = addNode(i->getId()); 
+
+				// combine edges
+				ListIterator<int> iter(*i);
+				for(int *i = iter.start(); iter.hasNext(i); i = iter.next())
+				{
+					addEdge(mynode->getId(), *i);
+				}
+
+			}
+		}
 
 };
-
-
 
 #endif
