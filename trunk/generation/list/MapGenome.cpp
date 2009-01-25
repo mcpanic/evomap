@@ -58,7 +58,7 @@ void MapGenome::Init(GAGenome &g)
 			if(i!=j && GAFlipCoin(INITGRAPHSPARSITY))
 			{
 				if(i->addEdge(j->getId()) ^	j->addEdge(i->getId()))
-					fprintf(stderr,"connection irregular\n");
+					fprintf(stdout,"connection irregular\n");
 			}
 		}
 	}
@@ -89,10 +89,12 @@ int MapGenome::Mutate(GAGenome&g, float pMut)
 	cout << child << endl;
 
 	if(GAFlipCoin(pMut*0.5))
-		child.mutateNode(pMut);
-	if(GAFlipCoin(pMut*0.5))
-		child.mutateEdge(pMut);
-	cout << child << endl;
+		nMut += child.mutateNode(pMut);
+//	if(GAFlipCoin(pMut*0.5))
+	//	nMut += child.mutateEdge(pMut);
+	
+	if(nMut)
+		cout << child << endl;
 
   return nMut;
 }
@@ -110,21 +112,21 @@ int MapGenome::mutateNode(float pMut)
 	// add nodes
 	if(size < DICSIZE && GAFlipCoin(pMut/3.0*0.55))
 	{
-		fprintf(stderr,"add\n");
+		fprintf(stdout,"add\n");
 		count += addRandomNode();
 	}
 
 	// randomly remove a node
 	if(GAFlipCoin(pMut / 3.0*0.45))
 	{
-		fprintf(stderr,"remove\n");
+		fprintf(stdout,"remove\n");
 		count += removeRandomNode();
 	}
 
 	// randomly rename
 	if(size < DICSIZE && size>0 && GAFlipCoin(pMut / 3.0))
 	{
-		fprintf(stderr,"rename\n");
+		fprintf(stdout,"rename\n");
 		count += renameRandomNode();
 	}
 
@@ -142,16 +144,16 @@ int MapGenome::mutateEdge(float pMut)
 	// remove random edge	
 	if(GAFlipCoin(pMut * 0.55))
 	{
-		fprintf(stderr, "edgeadd\n");
+		fprintf(stdout, "edgeadd\n");
 		count += addRandomEdge();
 	}
 	if(GAFlipCoin(pMut * 0.45))
 	{
-		fprintf(stderr,"edgedel\n");
+		fprintf(stdout,"edgedel\n");
 		count += removeRandomEdge();
 	}
 
-	return 0;
+	return count;
 } 
 
 int MapGenome::addRandomNode() {
@@ -221,7 +223,7 @@ int MapGenome::renameRandomNode() {
 	nodeList.warp(n);
 	MapNode *t = nodeList.remove();
 	if(t==NULL){
-		fprintf(stderr,"removee is null\n");
+		fprintf(stdout,"removee is null\n");
 		return 0;
 	}
 	renameEdges(t->getId(),newid);
@@ -305,9 +307,11 @@ float MapGenome::Compare(const GAGenome&g1, const GAGenome&g2)
  */
 int MapGenome::Cross(const GAGenome&p1, const GAGenome&p2, GAGenome*c1, GAGenome*c2)
 {
-	
 	if(c1 && c2)
 	{
+		fprintf(stdout,"cross\n");
+		cout << (MapGenome&)p1 << endl;
+		cout << (MapGenome&)p2 << endl;
 		MapGenome& bro = (MapGenome&)*c1;
 		MapGenome& sis = (MapGenome&)*c2;
 		bro.copy(p1);
@@ -317,19 +321,32 @@ int MapGenome::Cross(const GAGenome&p1, const GAGenome&p2, GAGenome*c1, GAGenome
 		UndirectedGraph *bro_arm = bro.getRandomSubgraph(&bro_arm_root);
 		UndirectedGraph *sis_arm = sis.getRandomSubgraph(&sis_arm_root);
 
+		int broid = bro_arm_root->getId();
+		int sisid = sis_arm_root->getId();
+		int tmpid = DICSIZE; // temporaryu
+		bro_arm->renameNode(broid, tmpid);
+		sis_arm->renameNode(sisid, tmpid+1);
+
+
 		bro.subtract(*bro_arm);
 		sis.subtract(*sis_arm);
 
-		int broid = bro_arm_root->getId();
-		int sisid = sis_arm_root->getId();
+		bro_arm->renameNode(tmpid, broid);
+		sis_arm->renameNode(tmpid+1, sisid);
+
+
 		bro_arm->renameNode(broid, sisid);
 		sis_arm->renameNode(sisid, broid);
+
 
 		bro.combine(*sis_arm);
 		sis.combine(*bro_arm);
 
 		delete sis_arm;
 		delete bro_arm;
+
+		cout << bro << endl;
+		cout << sis << endl;
 	
 		return 2;
 	}
@@ -350,13 +367,25 @@ UndirectedGraph* MapGenome::getRandomSubgraph(MapNode** root)
 	
 	MapNode* newroot = newgraph->addNode(rootNode->getId()); //save node
 
-	// save edges
-	ListIterator<int> iter(*newroot);
+	ListIterator<int> iter(*rootNode);
 	for(int* i = iter.start();iter.hasNext(i);i = iter.next())
 	{
-		if(GAFlipCoin(0.7)) {
-			newroot->addEdge(*i);
+		if(GAFlipCoin(0.1)) {
+			newgraph->addNode(*i);//save node
+			newgraph->addEdge(newroot->getId(),*i);// save edge
+			_getSubgraph(*i,*newgraph);
 		}
+	}
+
+	if(newroot->size() == 0)
+	{
+		//randomly select one adjacent node
+		int size = rootNode->size();
+		int oid = *rootNode->warp(GARandomInt(0,size-1));
+		MapNode* other = findNode(oid);
+		newgraph->addNode(oid);
+		newgraph->addEdge(newroot->getId(),oid);
+		_getSubgraph(oid,*newgraph);
 	}
 
 	*root = rootNode; // return value
@@ -367,13 +396,13 @@ UndirectedGraph* MapGenome::getRandomSubgraph(MapNode** root)
 void MapGenome::_getSubgraph(int rootid, UndirectedGraph& newgraph)
 {
 	MapNode *newroot = findNode(rootid);
-	newgraph.addNode(rootid);// save node
 
 	ListIterator<int> iter(*newroot);
 	for(int* i = iter.start();iter.hasNext(i);i = iter.next())
 	{
-		if(GAFlipCoin(0.7)) { // selectively save edge and adjacent node
-			newroot->addEdge(*i);
+		if(GAFlipCoin(0.1)) { // selectively save edge and adjacent node
+			newgraph.addNode(*i);//save node 
+			newgraph.addEdge(newroot->getId(),*i);//save edge
 			_getSubgraph(*i,newgraph); 
 		}
 	}

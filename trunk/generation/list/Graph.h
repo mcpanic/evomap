@@ -32,6 +32,9 @@ class UndirectedGraph {
 
 		bool addEdge(int fromid, int toid) {
 			
+			if(fromid == toid)
+				return false;
+
 			MapNode* from = findNode(fromid);
 			MapNode* to = findNode(toid);
 
@@ -39,7 +42,7 @@ class UndirectedGraph {
 			{
 				return false;
 			}
-			
+				
 			from->addEdge(toid);
 			to->addEdge(fromid);
 			return true;

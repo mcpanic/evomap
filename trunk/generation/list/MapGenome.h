@@ -38,7 +38,8 @@ public:
 	}
 
 	friend ostream& operator<<(ostream &os, const MapGenome & p) {
-		
+		if(p.nodeList.size()==0)
+			os << "no node" << endl;
 		ListIterator<MapNode> iter(p.nodeList);
 		for(MapNode* i = iter.start();iter.hasNext(i);i = iter.next())
 		{
