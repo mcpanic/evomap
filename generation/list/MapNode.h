@@ -45,6 +45,8 @@ public:
 
 	bool addEdge(int targetid)
 	{
+		if(nodeId == targetid)
+			return false;
 		ListIterator< int >iter(*this);
 
 		// check for duplication
