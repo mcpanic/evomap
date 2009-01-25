@@ -47,7 +47,6 @@ public:
 		ListIterator<int> iter(*this);
 		for(int *i = iter.start(); iter.hasNext(i); i = iter.next())
 		{
-			printf("[%d]",*i);
 			if(*i == oldid){
 				*i = newid;
 			}

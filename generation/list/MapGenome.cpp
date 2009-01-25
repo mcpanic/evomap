@@ -88,8 +88,10 @@ int MapGenome::Mutate(GAGenome&g, float pMut)
 	
 	cout << child << endl;
 
-	if(GAFlipCoin(pMut))
+	if(GAFlipCoin(pMut*0.5))
 		child.mutateNode(pMut);
+	if(GAFlipCoin(pMut*0.5))
+		child.mutateEdge(pMut);
 	cout << child << endl;
 
   return nMut;
@@ -106,21 +108,21 @@ int MapGenome::mutateNode(float pMut)
 	int count = 0;
 
 	// add nodes
-	if(GAFlipCoin(pMut) / 3.0)
+	if(size < DICSIZE && GAFlipCoin(pMut/3.0*0.55))
 	{
 		fprintf(stderr,"add\n");
 		count += addRandomNode();
 	}
 
 	// randomly remove a node
-	if(GAFlipCoin(pMut / 3.0))
+	if(GAFlipCoin(pMut / 3.0*0.45))
 	{
 		fprintf(stderr,"remove\n");
 		count += removeRandomNode();
 	}
 
 	// randomly rename
-	if(size>0 && GAFlipCoin(pMut / 3.0))
+	if(size < DICSIZE && size>0 && GAFlipCoin(pMut / 3.0))
 	{
 		fprintf(stderr,"rename\n");
 		count += renameRandomNode();
@@ -135,13 +137,19 @@ int MapGenome::mutateNode(float pMut)
  */
 int MapGenome::mutateEdge(float pMut)
 {
-	
+	int count = 0;
 	// add random edge
 	// remove random edge	
-	if(GAFlipCoin(pMut * 0.5))
-		addRandomEdge();
-	if(GAFlipCoin(pMut * 0.5))
-		removeRandomEdge();
+	if(GAFlipCoin(pMut * 0.55))
+	{
+		fprintf(stderr, "edgeadd\n");
+		count += addRandomEdge();
+	}
+	if(GAFlipCoin(pMut * 0.45))
+	{
+		fprintf(stderr,"edgedel\n");
+		count += removeRandomEdge();
+	}
 
 	return 0;
 } 
@@ -180,9 +188,10 @@ int MapGenome::addRandomNode() {
 			
 		}	while(t->getId()==f->getId());
 
-		addEdge(t->getId(),f->getId());
-		
-		
+		t->addEdge(f->getId());
+		f->addEdge(t->getId());
+		//addEdge(t->getId(),f->getId());
+			
 	}
 	
 
@@ -215,7 +224,6 @@ int MapGenome::renameRandomNode() {
 		fprintf(stderr,"removee is null\n");
 		return 0;
 	}
-	printf("rename %d->%d",t->getId(),newid);
 	renameEdges(t->getId(),newid);
 	t->setId(newid);
 	nodeList.insert(*t);
@@ -225,13 +233,51 @@ int MapGenome::renameRandomNode() {
 }
 
 int MapGenome::addRandomEdge() {
-	
-	return 0;
+
+	int size = nodeList.size();
+	int f, t;
+
+	if(size <2)
+		return 0;
+
+	do {
+		f = GARandomInt(0,size-1);
+		t = GARandomInt(0,size-1);
+	} while(f ==t);
+
+	MapNode* from = nodeList.warp(f);
+	MapNode* to = nodeList.warp(t);
+
+	from->addEdge(to->getId());
+	to->addEdge(from->getId());
+
+
+	return 1;
 }
 
 int MapGenome::removeRandomEdge() {
-	return 0;
+	int size = nodeList.size();
+	int f, t;
+
+	if(size <=2)
+		return 0;
+
+	do {
+		f = GARandomInt(0,size-1);
+		t = GARandomInt(0,size-1);
+	} while(f == t);
+
+	MapNode* from = nodeList.warp(f);
+	MapNode* to = nodeList.warp(t);
+
+	from->deleteEdge(to->getId());
+	to->deleteEdge(from->getId());
+	
+	deleteUnconnectedNodes();
+// it may not be 1 if the edge already exists
+	return 1;
 }
+
 
 
 float MapGenome::Evaluate(GAGenome&g)
