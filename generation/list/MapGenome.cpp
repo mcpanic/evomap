@@ -312,39 +312,40 @@ int MapGenome::Cross(const GAGenome&p1, const GAGenome&p2, GAGenome*c1, GAGenome
 		MapGenome& sis = (MapGenome&)*c2;
 		bro.copy(p1);
 		sis.copy(p2);
-		// choose random node from bro
-		// choose random node from sis
 		// bro's node is exchanged with sis's node
 		// adjacent nodes are selected and copied, and edges retained
-		bro.migrateNode(*bro.findNode(GARandomInt(0,bro.nodeList.size()-1)), sis);	
-		sis.migrateNode(*sis.findNode(GARandomInt(0,sis.nodeList.size()-1)), bro);
+		MapNode* k1 = bro.nodeList.warp(GARandomInt(0,bro.nodeList.size()-1));
+		bro.migrateNode(*k1, sis);	
+		MapNode* k2 = sis.nodeList.warp(GARandomInt(0,sis.nodeList.size()-1));
+		sis.migrateNode(*k2, bro);
 		return 2;
-	}
-	if(c1)
-	{
-				
-	}
-	if(c2)
-	{
-
 	}
 
 	return 0;
 }
 
-void MapGenome::migrateNode(MapNode&target, MapGenome&other)
+void MapGenome::migrateNode(MapNode& migratee, MapGenome& newgraph)
 {
-	MapNode* newnode = other.addNode(target.getId());
+	MapNode* newnode = newgraph.findNode(migratee.getId());
+	// if node with targetid already exists: exchange edges only
+	// if not, create
+	if(newnode == NULL)
+		newnode = newgraph.addNode(migratee.getId());
 	
-	ListIterator<int> iter(target);
-
+	ListIterator<int> iter(migratee);
 	for(int *i = iter.start();iter.hasNext(i);i = iter.next())
 	{
 		if(GAFlipCoin(0.4)) {
-			migrateNode(*findNode(*i),other);
-			addEdge(newnode->getId(),*i);	
+			MapNode* target = findNode(*i);
+			if(target == NULL)
+				printf("node with id %d not found\n",*i);
+			migrateNode(*target,newgraph);
+	
+			newgraph.addEdge(newnode->getId(),*i);	
 		}
 	}
 
+	// after copying is done, remove node from current graph
+	deleteNode(migratee.getId());
 
 }
