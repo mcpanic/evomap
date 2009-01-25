@@ -76,6 +76,7 @@ private:
 	int renameRandomNode();
 	int addRandomEdge();
 	int removeRandomEdge();
+	void migrateNode(MapNode& target, MapGenome&other); 
 
 
 };

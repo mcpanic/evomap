@@ -303,8 +303,48 @@ float MapGenome::Compare(const GAGenome&g1, const GAGenome&g2)
  * reconstruct brother and sister
  *
  */
-int MapGenome::Cross(const GAGenome&g1, const GAGenome&g2, GAGenome*g3, GAGenome*g4)
+int MapGenome::Cross(const GAGenome&p1, const GAGenome&p2, GAGenome*c1, GAGenome*c2)
 {
-	// not to be implemented
+	
+	if(c1 && c2)
+	{
+		MapGenome& bro = (MapGenome&)*c1;
+		MapGenome& sis = (MapGenome&)*c2;
+		bro.copy(p1);
+		sis.copy(p2);
+		// choose random node from bro
+		// choose random node from sis
+		// bro's node is exchanged with sis's node
+		// adjacent nodes are selected and copied, and edges retained
+		bro.migrateNode(*bro.findNode(GARandomInt(0,bro.nodeList.size()-1)), sis);	
+		sis.migrateNode(*sis.findNode(GARandomInt(0,sis.nodeList.size()-1)), bro);
+		return 2;
+	}
+	if(c1)
+	{
+				
+	}
+	if(c2)
+	{
+
+	}
+
 	return 0;
+}
+
+void MapGenome::migrateNode(MapNode&target, MapGenome&other)
+{
+	MapNode* newnode = other.addNode(target.getId());
+	
+	ListIterator<int> iter(target);
+
+	for(int *i = iter.start();iter.hasNext(i);i = iter.next())
+	{
+		if(GAFlipCoin(0.4)) {
+			migrateNode(*findNode(*i),other);
+			addEdge(newnode->getId(),*i);	
+		}
+	}
+
+
 }

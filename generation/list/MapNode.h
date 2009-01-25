@@ -11,6 +11,30 @@ public:
 		nodeId = id;
 	}
 
+	MapNode(const MapNode& orig) { 
+		copy(orig); 
+	}
+
+	MapNode* clone() const 
+	{
+		return new MapNode(*this);
+	}
+
+
+	MapNode& operator=(const MapNode& orig){
+		if(&orig != this) copy(orig);
+		return *this;
+	}
+
+
+	void copy(const MapNode& orig) {
+		// this copies all of the base genome parts
+		LinkedList<int>::copy(orig);
+		nodeId = orig.nodeId;
+	}
+
+
+
 	int getId() const {
 		return nodeId;
 	}
