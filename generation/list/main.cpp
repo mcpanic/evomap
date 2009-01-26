@@ -22,9 +22,9 @@ int main(int argc, char* argv[])
 	// Define GA
 	GASteadyStateGA ga(genome);
 	ga.populationSize(10);
-	ga.nGenerations(1000);
+	ga.nGenerations(100);
 	ga.pMutation(1.0);
-	ga.set(gaNpCrossover, 0.2);
+	ga.set(gaNpCrossover, 0.4);
 	// Evolve
 	ga.evolve();
 }

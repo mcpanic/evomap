@@ -39,22 +39,21 @@ public:
 
 	friend ostream& operator<<(ostream &os, const MapGenome & p) {
 		if(p.nodeList.size()==0)
-			os << "no node" << endl;
+			return os;
 		ListIterator<MapNode> iter(p.nodeList);
 		for(MapNode* i = iter.start();iter.hasNext(i);i = iter.next())
 		{
-			os << "node(" << i->getId() << ")" << endl;
-			os << "  toward: ";
+			os << i->getId();
 
 			ListIterator<int> iter(*i);
 			for(int *i = iter.start(); iter.hasNext(i); i = iter.next())
 			{
 				//if(!iter.isStart(i)) // skip node id
-					os << *i << " ";
+					os << " " << *i;
 			}
 			os << endl;
 		}
-
+		os << endl;
 		return os;
 	}
 
