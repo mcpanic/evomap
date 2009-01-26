@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 using namespace std;
+#include "MyGA.h"
 #include "MapGenome.h"
 
 
@@ -18,24 +19,21 @@ GATerminateUponGeneration(GAGeneticAlgorithm & ga){
 
 int main(int argc, char* argv[])
 {
-
 	MapGenome genome;
 
 	MapGenome::Init(genome);
 
 
 	// Define GA
-	GASimpleGA ga(genome);
-	ga.set(gaNpopulationSize, 2);	// population size
-  ga.set(gaNpCrossover, 0.3);		// probability of crossover
+	MyGA ga(genome);
+	ga.set(gaNpopulationSize, 10);	// population size
+  ga.set(gaNpCrossover, 0.1);		// probability of crossover
   ga.set(gaNpMutation, 1.0);		// probability of mutation
-  ga.set(gaNnGenerations, 10);		// number of generations
+  ga.set(gaNnGenerations, 100);		// number of generations
  
-	//ga.pMutation(1.0);
-	//ga.set(gaNpCrossover, 0.4);
-	//ga.terminator(GATerminateUponGeneration);
 	// Evolve
 	ga.evolve();
+	printf("finishing\n");
 
 }
 

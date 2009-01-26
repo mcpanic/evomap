@@ -89,8 +89,8 @@ int MapGenome::Mutate(GAGenome&g, float pMut)
 
 	if(GAFlipCoin(pMut*0.5))
 		nMut += child.mutateNode(pMut);
-//	if(GAFlipCoin(pMut*0.5))
-	//	nMut += child.mutateEdge(pMut);
+	if(GAFlipCoin(pMut*0.5))
+		nMut += child.mutateEdge(pMut);
 	
 
   return nMut;
@@ -113,13 +113,13 @@ int MapGenome::mutateNode(float pMut)
 	}
 
 	// add nodes
-	if(size < DICSIZE && GAFlipCoin(pMut/3.0*0.55))
+	if(size < DICSIZE && GAFlipCoin(pMut/3.0*0.75))
 	{
 		count += addRandomNode();
 	}
 
 	// randomly remove a node
-	if(GAFlipCoin(pMut / 3.0*0.45))
+	if(GAFlipCoin(pMut/3.0*0.25))
 	{
 		count += removeRandomNode();
 	}
@@ -136,11 +136,11 @@ int MapGenome::mutateEdge(float pMut)
 	int count = 0;
 	// add random edge
 	// remove random edge	
-	if(GAFlipCoin(pMut * 0.55))
+	if(GAFlipCoin(pMut * 0.35))
 	{
 		count += addRandomEdge();
 	}
-	if(GAFlipCoin(pMut * 0.45))
+	if(GAFlipCoin(pMut * 0.65))
 	{
 		count += removeRandomEdge();
 	}
@@ -278,10 +278,11 @@ float MapGenome::Evaluate(GAGenome&g)
 {
 	MapGenome& map = (MapGenome&)g;
 	cout << map;
-	
+	printf("end\n");
+	float value;
 	/* include human evaluation */
-
-	return GARandomDouble(0,15.0);
+	cin >> value;
+	return value;
 }
 
 

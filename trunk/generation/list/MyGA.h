@@ -27,6 +27,8 @@ public:
 		for(i=0; i<tmpPop->size(); i++)
 			pop->add(tmpPop->individual(i));
 		
+		printf("generation %d\n",stats.generation());
+
 		pop->evaluate(gaTrue);		// get info about current pop for next time
 		pop->scale();			// remind the population to do its scaling
 
