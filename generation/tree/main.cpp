@@ -92,6 +92,7 @@ int main(int argc, char **argv)
 
 float objective(GAGenome & c) {
     GATreeGenome<Topic> & chrom = (GATreeGenome<Topic> &)c;
+		printf("e");
     return chrom.size();
 }
 

@@ -7,33 +7,66 @@ class GASession
 		@sid = timestamp
 		@@active_sessions[@sid] = self
 		@proc = open("|../../generation/list/evolve")
-	  
+	  @generation = 0
+		@mapid = 0
+		@finishing = false
 	end
 
-	def step
+	def step(prevscore)
+		unless prevscore.nil?
+			@proc.puts prevscore # feed in score
+		end
+
 		@graph = {} # graph is a hash, with nodeid -> hash
 		# READ 
 		str = ''
 		flag = true
 		while flag
-			str = gets
-			if str == "\n"
+			str = @proc.gets
+			if str == "end\n" ## end condition 
 				flag = false
-			else 
+			elsif str == "finishing\n"
+				flag = false
+				@finishing = true
+			elsif	str =~ /generation [0-9]+.*/  ## new generation
+				@generation = /generation (0-9]+)/.match(str)[1] + 1
+				@mapid = 0
+			else ## retrieve graph
 				arr = str.split(' ')
-				curnode = 0
+				curnode = nil
 				arr.each do |e|
-					if @graph[e].nil?
+					if curnode.nil?
+						curnode = e
+					end
+					
+					if @graph[curnode].nil?
 						@graph[e] = Array.new
 						curnode = e
 					else
 						@graph[curnode].push(e)
 					end
 				end
-				puts "\n"
 			end
 		end
-		return @graph		
+
+		@mapid = @mapid + 1
+		return @graph
+	end
+
+	def finishing?
+		@finishing
+	end
+
+	def generation
+		@generation
+	end
+
+	def mapid
+		@mapid
+	end
+
+	def sid
+		@sid
 	end
 
 

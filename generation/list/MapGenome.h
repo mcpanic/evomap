@@ -59,7 +59,6 @@ public:
 			}
 			os << endl;
 		}
-		os << endl;
 		return os;
 	}
 
