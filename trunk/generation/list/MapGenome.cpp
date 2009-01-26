@@ -86,15 +86,12 @@ int MapGenome::Mutate(GAGenome&g, float pMut)
 
   if(pMut <= 0.0) return 0;
 	
-	cout << child << endl;
 
 	if(GAFlipCoin(pMut*0.5))
 		nMut += child.mutateNode(pMut);
 //	if(GAFlipCoin(pMut*0.5))
 	//	nMut += child.mutateEdge(pMut);
 	
-	if(nMut)
-		cout << child << endl;
 
   return nMut;
 }
@@ -109,25 +106,22 @@ int MapGenome::mutateNode(float pMut)
 	int size = nodeList.size();
 	int count = 0;
 
+	// randomly rename
+	if(size < DICSIZE && size>0 && GAFlipCoin(pMut / 3.0))
+	{
+		count += renameRandomNode();
+	}
+
 	// add nodes
 	if(size < DICSIZE && GAFlipCoin(pMut/3.0*0.55))
 	{
-		fprintf(stdout,"add\n");
 		count += addRandomNode();
 	}
 
 	// randomly remove a node
 	if(GAFlipCoin(pMut / 3.0*0.45))
 	{
-		fprintf(stdout,"remove\n");
 		count += removeRandomNode();
-	}
-
-	// randomly rename
-	if(size < DICSIZE && size>0 && GAFlipCoin(pMut / 3.0))
-	{
-		fprintf(stdout,"rename\n");
-		count += renameRandomNode();
 	}
 
 	return count;
@@ -144,12 +138,10 @@ int MapGenome::mutateEdge(float pMut)
 	// remove random edge	
 	if(GAFlipCoin(pMut * 0.55))
 	{
-		fprintf(stdout, "edgeadd\n");
 		count += addRandomEdge();
 	}
 	if(GAFlipCoin(pMut * 0.45))
 	{
-		fprintf(stdout,"edgedel\n");
 		count += removeRandomEdge();
 	}
 
@@ -284,7 +276,11 @@ int MapGenome::removeRandomEdge() {
 
 float MapGenome::Evaluate(GAGenome&g)
 {
+	MapGenome& map = (MapGenome&)g;
+	cout << map;
+		
 	/* include human evaluation */
+
 	return 0.0f;
 }
 
@@ -309,9 +305,6 @@ int MapGenome::Cross(const GAGenome&p1, const GAGenome&p2, GAGenome*c1, GAGenome
 {
 	if(c1 && c2)
 	{
-		fprintf(stdout,"cross\n");
-		cout << (MapGenome&)p1 << endl;
-		cout << (MapGenome&)p2 << endl;
 		MapGenome& bro = (MapGenome&)*c1;
 		MapGenome& sis = (MapGenome&)*c2;
 		bro.copy(p1);
@@ -354,8 +347,6 @@ int MapGenome::Cross(const GAGenome&p1, const GAGenome&p2, GAGenome*c1, GAGenome
 			exit(0);
 		}
 
-		cout << bro << endl;
-		cout << sis << endl;
 	
 		return 2;
 	}

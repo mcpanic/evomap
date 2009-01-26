@@ -1,4 +1,5 @@
 require 'socket'
+require 'erb'
 
 class HttpServer
   def initialize(session, request, basePath)
@@ -22,6 +23,21 @@ class HttpServer
 		return fileName
   end
 
+	def getContentType(path)
+    #TODO replace with access to HKEY_CLASSES_ROOT => "Content Type"
+    ext = File.extname(path)
+    return "text/html"  if ext == ".html" or ext == ".htm"
+    return "text/plain" if ext == ".txt"
+    return "text/css"   if ext == ".css"
+    return "image/jpeg" if ext == ".jpeg" or ext == ".jpg"
+    return "image/gif"  if ext == ".gif"
+    return "image/bmp"  if ext == ".bmp"
+    return "text/plain" if ext == ".rb"
+    return "text/xml"   if ext == ".xml"
+    return "text/xml"   if ext == ".xsl"
+    return "text/html"
+  end
+
   def serve()
     @fullPath = getFullPath()
 		src = nil
@@ -32,8 +48,7 @@ class HttpServer
           contentType = getContentType(@fullPath)
           @session.print "HTTP/1.1 200/OK\r\nServer: Makorsha\r\nContent-type: #{contentType}\r\n\r\n"
           src = File.open(@fullPath, "rb")
-
-          while (not src.eof?)
+	        while (not src.eof?)
             buffer = src.read(256)
             @session.write(buffer)
           end
@@ -52,20 +67,6 @@ class HttpServer
     end
   end
 
-  def getContentType(path)
-    #TODO replace with access to HKEY_CLASSES_ROOT => "Content Type"
-    ext = File.extname(path)
-    return "text/html"  if ext == ".html" or ext == ".htm"
-    return "text/plain" if ext == ".txt"
-    return "text/css"   if ext == ".css"
-    return "image/jpeg" if ext == ".jpeg" or ext == ".jpg"
-    return "image/gif"  if ext == ".gif"
-    return "image/bmp"  if ext == ".bmp"
-    return "text/plain" if ext == ".rb"
-    return "text/xml"   if ext == ".xml"
-    return "text/xml"   if ext == ".xsl"
-    return "text/html"
-  end
 end
 
 def logger(message)
@@ -75,7 +76,7 @@ def logger(message)
 end
 
 basePath = File.expand_path("../web/")
-server = TCPServer.new(4000)
+server = TCPServer.new(3500)
 logfile = basePath + "/log.txt"
 $log = File.open(logfile, "w+")
 
