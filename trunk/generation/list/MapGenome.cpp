@@ -14,6 +14,8 @@ MapGenome::MapGenome() {
 	mutator(Mutate);
 	evaluator(Evaluate);
 	crossover(Cross);
+//	compare(Compare);
+	
 }
 
 void MapGenome::clear()
@@ -83,9 +85,7 @@ int MapGenome::Mutate(GAGenome&g, float pMut)
 	// change topic map by: add/remove node or edge
   MapGenome &child = (MapGenome&)g;
 	int nMut = 0;
-
   if(pMut <= 0.0) return 0;
-	
 
 	if(GAFlipCoin(pMut*0.5))
 		nMut += child.mutateNode(pMut);
@@ -278,23 +278,26 @@ float MapGenome::Evaluate(GAGenome&g)
 {
 	MapGenome& map = (MapGenome&)g;
 	cout << map;
-		
+	
 	/* include human evaluation */
 
-	return 0.0f;
+	return GARandomDouble(0,15.0);
 }
 
-/*
+
 float MapGenome::Compare(const GAGenome&g1, const GAGenome&g2)
 {
+	/*
 	  MapGenome &sis=(MapGenome &)g1;
 	  MapGenome &bro=(MapGenome &)g2;
 		int s1 = sis.map.size();
 		int s2 = bro.map.size();
-		
+
 	  return s1 == s2 ? 0 : (s1 > s2 ? s1 - s2 : s2 - s1);
+	*/
+	return GARandomDouble(0.0, 5.0);
 }
-*/
+
 
 /* Crossover:
  * select k1, k2 from mom and dad

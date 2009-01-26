@@ -10,6 +10,11 @@ using namespace std;
 
 int DICSIZE = 100;
 
+GABoolean
+GATerminateUponGeneration(GAGeneticAlgorithm & ga){
+	  return(ga.generation() < ga.nGenerations() ? gaFalse : gaTrue);
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -20,12 +25,17 @@ int main(int argc, char* argv[])
 
 
 	// Define GA
-	GASteadyStateGA ga(genome);
-	ga.populationSize(10);
-	ga.nGenerations(100);
-	ga.pMutation(1.0);
-	ga.set(gaNpCrossover, 0.4);
+	GASimpleGA ga(genome);
+	ga.set(gaNpopulationSize, 2);	// population size
+  ga.set(gaNpCrossover, 0.3);		// probability of crossover
+  ga.set(gaNpMutation, 1.0);		// probability of mutation
+  ga.set(gaNnGenerations, 10);		// number of generations
+ 
+	//ga.pMutation(1.0);
+	//ga.set(gaNpCrossover, 0.4);
+	//ga.terminator(GATerminateUponGeneration);
 	// Evolve
 	ga.evolve();
+
 }
 

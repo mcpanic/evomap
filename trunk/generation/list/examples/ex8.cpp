@@ -111,22 +111,22 @@ main(int argc, char *argv[])
 // if we wanted - either way will work.
 
   GASteadyStateGA ga(genome);
-  GASigmaTruncationScaling scale;
-  ga.scaling(scale);
+  //GASigmaTruncationScaling scale;
+  //ga.scaling(scale);
   ga.crossover(GAListGenome<int>::OnePointCrossover);
 
 // Set the default parameters we want to use, then check the command line for
 // other arguments that might modify these.
 
-  ga.set(gaNpopulationSize, 40);	// population size
+  ga.set(gaNpopulationSize, 1);	// population size
   ga.set(gaNpCrossover, 0.6);		// probability of crossover
   ga.set(gaNpMutation, 0.05);		// probability of mutation
   ga.set(gaNnGenerations, 50);		// number of generations
-  ga.set(gaNscoreFrequency, 1);		// how often to record scores
-  ga.set(gaNflushFrequency, 10);	// how often to dump scores to file
-  ga.set(gaNselectScores,		// which scores should we track?
-	 GAStatistics::Maximum|GAStatistics::Minimum|GAStatistics::Mean);
-  ga.set(gaNscoreFilename, "bog.dat");
+	//ga.set(gaNscoreFrequency, 1);		// how often to record scores
+  //ga.set(gaNflushFrequency, 10);	// how often to dump scores to file
+  //ga.set(gaNselectScores,		// which scores should we track?
+	 //GAStatistics::Maximum|GAStatistics::Minimum|GAStatistics::Mean);
+  //ga.set(gaNscoreFilename, "bog.dat");
   ga.parameters(argc, argv);
 
 // Evolve the genetic algorithm then dump out the results of the run.
@@ -162,6 +162,8 @@ objective(GAGenome & c)
 {
   GAListGenome<int> & genome = (GAListGenome<int> &)c;
   int count=0;
+	static int step = 0;
+	printf("%d,",step++);
   if(!genome.head()) return 0;
   count = (*genome.head() == 101) ? 1 : 0; // move to head of the list
   for(int i=1; i<genome.size(); i++)
