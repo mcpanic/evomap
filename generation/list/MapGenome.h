@@ -4,6 +4,7 @@
 #define MAXINITNODES 6
 #define INITGRAPHSPARSITY 0.4
 
+//#include "MyGA.h"
 #include "Graph.h"
 
 class MapGenome : public GAGenome, public UndirectedGraph {
@@ -29,14 +30,19 @@ public:
 	void copy(const GAGenome& orig) {
 		// this copies all of the base genome parts
 		GAGenome::copy(orig);
+		initializer(Init);
+		mutator(Mutate);
+		evaluator(Evaluate);
+		crossover(Cross);
+
 		MapGenome& genome = (MapGenome&)orig;
 		nodeList.copy(genome.nodeList);
 	}
-
+/*
 	virtual int equal(const GAGenome& g) const {
-		return 0;
+		return 1;
 	}
-
+*/
 	friend ostream& operator<<(ostream &os, const MapGenome & p) {
 		if(p.nodeList.size()==0)
 			return os;
@@ -64,6 +70,7 @@ public:
 	static int Mutate(GAGenome&, float);
 	static float Evaluate(GAGenome&);
 	static int Cross(const GAGenome&, const GAGenome&, GAGenome*, GAGenome*);
+	static float Compare(const GAGenome&g1, const GAGenome&g2);
 
 private:
 
