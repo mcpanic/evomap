@@ -8,7 +8,6 @@ class MainController < ApplicationController
 	end
 
 	def evaluate
-		puts params
 		case params[:stage]
 			when "start" 	# reset
 				@gasession = GASession.new(Time.now.to_i) # START GA

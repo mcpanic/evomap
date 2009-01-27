@@ -40,6 +40,11 @@
 					<url><![CDATA[http://cs.stanford.edu/degrees/mscs/specializations/]]></url>
 					<children>
 						<node>
+							<label><![CDATA[Stanford CS]]></label>
+							<url><![CDATA[http://cs.stanford.edu/]]></url>
+							<children/>
+						</node>
+						<node>
 							<label><![CDATA[HCI]]></label>
 							<url><![CDATA[http://cs.stanford.edu/degrees/mscs/specializations/#HCI]]></url>
 							<children>

@@ -1,12 +1,13 @@
 <html>
 <head>
 	<title>Evomap Evaluation</title>
-	<script type="text/javascript" src="lib/processing.js"></script>
-	<script type="text/javascript" src="lib/treeview.js"></script>
+	<script type="text/javascript" src="/lib/processing.js"></script>
+	<script type="text/javascript" src="/lib/treeview.js"></script>
 	<script type="text/javascript">
 		function draw(evomapId)
 		{
 			displayTree('<%=@filepath%>', evomapId, 600, 400);
+			//displayTree('/test.xml',evomapId,600,400);
 		}
 
 		function validate(thisForm)
@@ -51,7 +52,7 @@
 		100 means the map consists fully of relative words, suggesting useful knowledge or meanings.<br /><br />
 	</div>
 	
-	<form name="eval_form" action="<%= @finishing ? 'main/finish' : 'main/evaluate'%>" onsubmit="return validate(this)" method="POST">
+	<form name="eval_form" action="<%= @finishing ? 'main/finish' : '/main/evaluate'%>" onsubmit="return validate(this)">
 
 	<div id="canvas" class="canvas">
 		<canvas id="evomap" class="evomap"></canvas>
@@ -79,6 +80,7 @@
 	* R-click &amp; drag the empty space: zoom<br/>
 	* Drag node: move the node<br/>
 	</div>
-
+	<div id="debug" style="position:absolute;left:300px;top:300px;">
+	</div>
 </body>
 </html>
