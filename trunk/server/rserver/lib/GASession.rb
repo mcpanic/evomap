@@ -6,7 +6,7 @@ class GASession
 	def initialize(timestamp)
 		@sid = timestamp
 		@@active_sessions[@sid] = self
-		@proc = open("|../../generation/list/evolve")
+		@proc = open("|../../generation/list/evolve","w+")
 	  @generation = 0
 		@mapid = 0
 		@finishing = false
@@ -15,6 +15,7 @@ class GASession
 	def step(prevscore)
 		unless prevscore.nil?
 			@proc.puts prevscore # feed in score
+			puts "entered #{prevscore}"
 		end
 
 		@graph = {} # graph is a hash, with nodeid -> hash
@@ -23,6 +24,7 @@ class GASession
 		flag = true
 		while flag
 			str = @proc.gets
+			puts str
 			if str == "end\n" ## end condition 
 				flag = false
 			elsif str == "finishing\n"
@@ -69,9 +71,14 @@ class GASession
 		@sid
 	end
 
+	def close
+		@proc.close unless @proc.nil?
+	end
 
 	def self.close(sid)
-		@@active_sessions[sid] = nil
+		session = @@active_sessions[sid]
+		session.close
+		@@active_sessions[sid]= nil	
 	end
 
 	def self.get(sid)
