@@ -10,6 +10,11 @@ var dify = 0;
 var beingDragged = null;
 var mouseMoved = false;
 
+// added 
+var urls = new Object();
+var drawn = new Object();
+var gdrawn = new Object();
+
 var canvas;
 var p;
 // for cursor type maintenance
@@ -31,22 +36,37 @@ function parseXML(xmlFile){
 
 //Build the JavaScript objects representing the tree
 function createObjects(element, depth){
-	element.label = element.getElementsByTagName("label")[0].firstChild.nodeValue;
-	element.url = element.getElementsByTagName("url")[0].firstChild.nodeValue;
-	element.depth = depth;
-	if(treeWidths[depth] == undefined){
-		treeWidths[depth] = 1;
-	} else {
-		treeWidths[depth]++;
+	var alreadysetup = true;
+	var url = element.getElementsByTagName("url")[0].firstChild.nodeValue;
+	var el = element;
+	if(!urls[url]) {
+		alreadysetup = false;
+		urls[url] = element;
+
+		element.url = url;
+		element.label = element.getElementsByTagName("label")[0].firstChild.nodeValue;
+		element.depth = depth;
+		if(treeWidths[depth] == undefined){
+			treeWidths[depth] = 1;
+		} else {
+			treeWidths[depth]++;
+		}
+		element.children = new Array();
+		//allNodes.push(element);
 	}
-	element.children = new Array();
-	allNodes.push(element);
-	
+	else
+		el = urls[url];
+
 	var children = element.getElementsByTagName("children")[0].childNodes;
 	for(var i=0; i<children.length; i++){
 		if(children[i].nodeType != 3 && children[i].tagName == "node"){  //TextNode = type 3
-			element.children.push(createObjects(children[i], depth+1));  //Recurse on children
+			el.children.push(createObjects(children[i], depth+1));  //Recurse on children
 		}
+	}
+
+	if(alreadysetup)
+	{
+		return urls[url];
 	}
 	
 	element.expanded = false;
@@ -61,6 +81,7 @@ function createObjects(element, depth){
 		element.width = getNodeWidth();
 	element.height = getNodeHeight();
 	return element;
+
 }
 
 //Get the leftmost X coordinate of the whole tree (currently visible)
@@ -181,12 +202,16 @@ function collapseNode(node){
 }
 
 //Recursive call for expanding the whole tree
-function expandAllNodes(node){
-	for (var i = 0; i < node.children.length; i++) {
-		node.children[i].visible = true;
-		node.children[i].expanded = true;
-		calculateChildrenPosition(node);
-		expandAllNodes(node.children[i]);
+function expandAllNodes(){
+
+	for (var i = 0; i < allNodes.length; i++) {
+		var node = allNodes[i];
+		for(var j = 0; j < node.children.length;j++)
+		{
+			node.children[j].visible = true;
+			node.children[j].expanded = true;
+			calculateChildrenPosition(node);
+		}
 	}
 }
 
@@ -396,6 +421,43 @@ function dance(power){
 	}
 }
 
+
+var edges = {};
+
+function listAll()
+{
+	for(var i = 0; i<allNodes.length;i++)
+	{
+		var node = allNodes[i];
+		for(var j = 0; j <node.children.length;j++)
+		{
+			var child = node.children[j];
+			document.getElementById('debug').innerHTML += (node.url+'->'+child.url + '<br/>');
+		}
+	}
+
+	edges = {};
+
+	document.getElementById('debug').innerHTML += '<br/>';
+
+
+}
+
+function traverse(root)
+{
+
+	for(var i = 0; i< root.children.length; i++)
+	{ 
+		var child = root.children[i];
+		if(!edges[root.url+'/'+child.url])
+		{
+			edges[root.url+'/'+child.url] = true;
+			document.getElementById('debug').innerHTML += (root.url+'->'+child.url + '('+root.children.length + ')<br/>');
+			traverse(child);
+		}
+	}
+}
+
 //Main function - called from HTML
 function displayTree(xmlFile, canvas_id, width, height){
 	//Local variables
@@ -410,7 +472,14 @@ function displayTree(xmlFile, canvas_id, width, height){
 	
 	//Build the object tree
 	createObjects(root, 0);
-	
+	for(var url in urls)
+	{
+		allNodes.push(urls[url])
+	}
+	edges = {};
+	// for debugging purpose
+	//	setTimeout( function() { listAll();traverse(root);},3000);
+
 	//Set root node visible
 	root.visible = true;
 	root.x = getCanvasWidth()/4;
@@ -437,6 +506,8 @@ function displayTree(xmlFile, canvas_id, width, height){
 	//Main draw loop
 	p.draw = function(){
 		p.background(getCanvasColor());
+		drawn = {};
+		edges = {};
 		display(root);
 		setCursor(0);
 		if (isDanceEnabled())
@@ -451,57 +522,69 @@ function displayTree(xmlFile, canvas_id, width, height){
 	//Recursively called to display appropriate nodes and link them with lines
 	//Also handles mouseover color change and dragging color change
 	function display(node){
+			
 		if(node.visible){
-			if (hasBorder() == true)
-				p.stroke(getBorderColor());
-			else
-				p.noStroke();
-				
-			if(beingDragged != null && node == beingDragged){
-				p.fill(getActiveColor());
-			} else if(p.mouseX >= node.x-node.width/2 && p.mouseX <= node.x+node.width/2 
- 				&& p.mouseY >= node.y-node.height/2 && p.mouseY <= node.y+node.height/2){
-				if (currentClickedNode == node)
-					p.fill(getSelectedColor());
+			if(!drawn[node.url])
+			{
+				drawn[node.url] = true;
+
+				if (hasBorder() == true)
+					p.stroke(getBorderColor());
 				else
-					p.fill(getHoverColor());
-						
-				//document.getElementById('show_label').innerHTML = node.label;
-				//document.getElementById('show_url').innerHTML = node.url;
-				//document.getElementById('show_url').href = node.url;
- 			} else if (currentClickedNode == node){
-				p.fill(getSelectedColor());						
-			} else{
- 				p.fill(getNodeColor());
- 			}			
-  			p.rect(node.x, node.y, node.width, node.height);
+					p.noStroke();
+					
+				if(beingDragged != null && node == beingDragged){
+					p.fill(getActiveColor());
+				} else if(p.mouseX >= node.x-node.width/2 && p.mouseX <= node.x+node.width/2 
+					&& p.mouseY >= node.y-node.height/2 && p.mouseY <= node.y+node.height/2){
+					if (currentClickedNode == node)
+						p.fill(getSelectedColor());
+					else
+						p.fill(getHoverColor());
+							
+					//document.getElementById('show_label').innerHTML = node.label;
+					//document.getElementById('show_url').innerHTML = node.url;
+					//document.getElementById('show_url').href = node.url;
+				} else if (currentClickedNode == node){
+					p.fill(getSelectedColor());						
+				} else{
+					p.fill(getNodeColor());
+				}			
+				p.rect(node.x, node.y, node.width, node.height);
+				
+				//Handle node expander graphic
+				if (node.children.length != 0) {
+					p.noStroke();
+					p.fill(getActiveColor());
+					p.rect(node.x+node.width/2, node.y, 3, 3);
+				}	
+				
+				//Handle text			
+				p.fill(getFontColor());
+					// calculate text size based on the current size of the node
+				p.textSize(getTextSize(node));
+				p.text(node.label, node.x - node.width/2 + 5, node.y + 5);
+					//p.text(node.label, node.x-35, node.y+5);
+			}		
+
+			//Used for drag/drop
+			var x_origin = node.x + node.width/2;
+			var y_origin = node.y;
 			
-			//Handle node expander graphic
-			if (node.children.length != 0) {
-				p.noStroke();
-				p.fill(getActiveColor());
-				p.rect(node.x+node.width/2, node.y, 3, 3);
-			}	
-			
-			//Handle text			
-			p.fill(getFontColor());
-				// calculate text size based on the current size of the node
-			p.textSize(getTextSize(node));
-			p.text(node.label, node.x - node.width/2 + 5, node.y + 5);
-  			//p.text(node.label, node.x-35, node.y+5);
-  			
-  			//Used for drag/drop
-  			var x_origin = node.x + node.width/2;
-  			var y_origin = node.y;
-  			
-  			//Recurse on children and draw connecting lines
-  			for(var i=0; i<node.children.length; i++){
-  				if(node.children[i].visible){
-  					display(node.children[i]);
-					p.stroke(getLineColor());
-  					p.line(x_origin, y_origin, node.children[i].x - node.children[i].width/2, node.children[i].y);
-  				}
-  			}
+			//Recurse on children and draw connecting lines
+			for(var i=0; i<node.children.length; i++){
+				if(node.children[i].visible){
+
+					if(!edges[node.url+'/'+node.children[i].url])
+					{
+						gdrawn[node.url+'/'+node.children[i].url] = true;
+						edges[node.url+'/'+node.children[i].url] = true;
+						display(node.children[i]);
+						p.stroke(getLineColor());
+						p.line(x_origin, y_origin, node.children[i].x - node.children[i].width/2, node.children[i].y);
+					}
+				}
+			}
 		}
 	}
 	
@@ -693,7 +776,7 @@ function displayTree(xmlFile, canvas_id, width, height){
 	}
 	
 	p.init();
-	
+	expandAll();
 }
 
 function updateNode (form) {

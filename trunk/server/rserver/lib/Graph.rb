@@ -33,17 +33,13 @@ class Graph
 			<url><![CDATA[#{nodeid}]]></url>
 		EOF
 		
-		if @visited[nodeid].nil?
-			@visited[nodeid] = @graph[nodeid]
 			xml+= "<children>"
 			@graph[nodeid].each do |adjid|
+				next if @visited[nodeid+'-'+adjid]
+				@visited[nodeid+'-'+adjid] = true
 				xml += create_xml adjid
-			end
-	
+			end	
 			xml+="</children>"
-		else
-			xml+="<children/>"
-		end
 		
 		xml+="</node>"
 

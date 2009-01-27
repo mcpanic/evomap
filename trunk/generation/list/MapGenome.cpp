@@ -277,6 +277,8 @@ int MapGenome::removeRandomEdge() {
 float MapGenome::Evaluate(GAGenome&g)
 {
 	MapGenome& map = (MapGenome&)g;
+	if(map.nodeList.size()==0)
+		return 0;
 	cout << map;
 	printf("end\n");
 	float value;
