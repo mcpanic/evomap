@@ -15,11 +15,21 @@ class MainController < ApplicationController
 			else 	# run
 				@gasession = GASession.get(session[:sid])
 		end
+	
 		@graph = @gasession.step(params[:prevscore])	# continue ga	
+		
+		if @gasession.generation % 10 != 0
+			while(@gasession.generation % 10 != 0)
+				@gasession.step_NN	
+			end
+		end
+
 		@finishing = @gasession.finishing?
 		graph = Graph.new(@graph)
 		@generation = @gasession.generation
 		@mapid = @gasession.mapid
+		@test_score = @gasession.test_score
+	
 		@filepath = graph.save(session[:sid],@generation,@mapid)
 		
 	end

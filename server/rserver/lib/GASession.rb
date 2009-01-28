@@ -1,3 +1,6 @@
+require 'Dictionary'
+require 'NN'
+
 class GASession
 	@@active_sessions = {}
 
@@ -6,18 +9,15 @@ class GASession
 	def initialize(timestamp)
 		@sid = timestamp
 		@@active_sessions[@sid] = self
-		@proc = open("|../../generation/list/evolve","w+")
+		@proc = open("|../../generation/list/evolve	#{Dictionary.size}","w+")
 	  @generation = 0
 		@mapid = 0
 		@finishing = false
+		@nn = NN.new
+		@test_score = 0
 	end
 
-	def step(prevscore)
-		unless prevscore.nil?
-			@proc.puts prevscore # feed in score
-			puts "entered #{prevscore}"
-		end
-
+	def recv_graph
 		@graph = {} # graph is a hash, with nodeid -> hash
 		# READ 
 		str = ''
@@ -31,7 +31,7 @@ class GASession
 				flag = false
 				@finishing = true
 			elsif	str =~ /generation [0-9]+.*/  ## new generation
-				@generation = /generation (0-9]+)/.match(str)[1] + 1
+				@generation = /generation ([0-9]+)/.match(str)[1].to_i + 1
 				@mapid = 0
 			else ## retrieve graph
 				arr = str.split(' ')
@@ -55,6 +55,23 @@ class GASession
 		return @graph
 	end
 
+	def step_NN
+		recv_graph
+		score = @nn.eval(@graph)
+		@proc.puts score
+		puts "entered #{score}"
+	end
+
+	def step(prevscore)
+		unless prevscore.nil?
+			@proc.puts prevscore # feed in score
+			puts "entered #{prevscore}"
+			@nn.train(@graph,prevscore)
+			@test_score = @nn.eval(@graph)
+		end
+		recv_graph
+	end
+
 	def finishing?
 		@finishing
 	end
@@ -69,6 +86,10 @@ class GASession
 
 	def sid
 		@sid
+	end
+
+	def test_score
+		@test_score
 	end
 
 	def close
