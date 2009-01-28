@@ -56,10 +56,10 @@ class GASession
 	end
 
 	def step_NN
-		recv_graph
 		score = @nn.eval(@graph)
 		@proc.puts score
 		puts "entered #{score}"
+		recv_graph
 	end
 
 	def step(prevscore)

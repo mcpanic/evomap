@@ -1,5 +1,5 @@
 class Dictionary
-
+=begin
 	@@_words = <<-EOF
 a
 b
@@ -14,6 +14,8 @@ k
 l
 EOF
 	@@__words = <<-EOF
+=end
+	@@_words = <<-EOF
 1. Music
 
 A cappella
