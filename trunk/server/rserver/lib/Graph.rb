@@ -1,9 +1,14 @@
+require 'Dictionary'
+
 class Graph
+		
+		@@dictionary = Dictionary.new
 
 	def initialize(graph)
 		# turn graph into tree
 		@graph = graph
 		@visited = {}
+
 	end
 
 	def save(sessionid, generation, mapid)
@@ -29,7 +34,7 @@ class Graph
 		xml = ''
 		xml	+= <<-EOF
 		<node>
-			<label><![CDATA[#{nodeid}]]></label>
+			<label><![CDATA[#{@@dictionary.lookup(nodeid)}]]></label>
 			<url><![CDATA[#{nodeid}]]></url>
 		EOF
 		

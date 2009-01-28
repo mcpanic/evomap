@@ -23,7 +23,9 @@ int main(int argc, char* argv[])
 
 	MapGenome::Init(genome);
 
-
+	if(argc == 2)
+		DICSIZE = atoi(argv[1]);
+	
 	// Define GA
 	MyGA ga(genome);
 	ga.set(gaNpopulationSize, 10);	// population size
