@@ -29,8 +29,8 @@ int main(int argc, char* argv[])
 	// Define GA
 	MyGA ga(genome);
 	ga.set(gaNpopulationSize, 10);	// population size
-  ga.set(gaNpCrossover, 0.1);		// probability of crossover
-  ga.set(gaNpMutation, 1.0);		// probability of mutation
+  ga.set(gaNpCrossover, 0.4);		// probability of crossover
+  ga.set(gaNpMutation, 0.5);		// probability of mutation
   ga.set(gaNnGenerations, 100);		// number of generations
  
 	// Evolve
