@@ -107,19 +107,19 @@ int MapGenome::mutateNode(float pMut)
 	int count = 0;
 
 	// randomly rename
-	if(size < DICSIZE && size>0 && GAFlipCoin(pMut / 3.0))
+	if(size < DICSIZE && size>0 && GAFlipCoin(pMut / 6.0))
 	{
 		count += renameRandomNode();
 	}
 
 	// add nodes
-	if(size < DICSIZE && GAFlipCoin(pMut/3.0*0.75))
+	if(size < DICSIZE && GAFlipCoin(pMut*5.0/6.0*0.9))
 	{
 		count += addRandomNode();
 	}
 
 	// randomly remove a node
-	if(GAFlipCoin(pMut/3.0*0.25))
+	if(GAFlipCoin(pMut*5.0/6.0*0.1))
 	{
 		count += removeRandomNode();
 	}
@@ -406,7 +406,7 @@ void MapGenome::_getSubgraph(int rootid, UndirectedGraph& newgraph)
 	ListIterator<int> iter(*newroot);
 	for(int* i = iter.start();iter.hasNext(i);i = iter.next())
 	{
-		if(GAFlipCoin(0.1)) { // selectively save edge and adjacent node
+		if(GAFlipCoin(0.4)) { // selectively save edge and adjacent node
 			newgraph.addNode(*i);//save node 
 			newgraph.addEdge(newroot->getId(),*i);//save edge
 			_getSubgraph(*i,newgraph); 

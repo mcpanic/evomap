@@ -2,11 +2,12 @@
 #define __MYGA_H__
 
 
-class MyGA : public GASteadyStateGA {
+class MyGA : public GAIncrementalGA {
 public:
   GADefineIdentity("MyGA", 288);
-  MyGA(const GAGenome& g) : GASteadyStateGA(g) {}
+  MyGA(const GAGenome& g) : GAIncrementalGA(g) {}
   virtual ~MyGA() {}
+	/*
   virtual void step() 
 	{ 
 		GAGenome *mom,*dad;
@@ -39,6 +40,7 @@ public:
 	}
 
   MyGA & operator++() { step(); return *this; }
+	*/
 };
 
 
